@@ -2,6 +2,7 @@ var context;
 var canvas;
 var time=0;
 var selectFrame=0;
+var SRBlue=0;// выбор приема Blue
 window.addEventListener('load', function () {
     preload();
     create();
@@ -20,7 +21,7 @@ var Line={
     angle:0,
     select:false,
 }
-var dataLine={
+/* var dataLine={
     lengthArr:[
         30,
         20,
@@ -33,10 +34,13 @@ var dataLine={
         20,
         10,
     ],
-}
+} */
 var humanBlue={
     x:100,
     y:263,
+	dx:0,
+	dy:0,
+	numMoveFrame:null,
     numAction:0,
     angleArr:[
         -90,
@@ -82,7 +86,7 @@ function calcLineInHuman(x,y,angle,length)// добавить линию
     //arrHumanLine.push(line);
     
 }
-function calcArrLine(x,y,angleArr,scale=1)// расчитываем из массива углов массив линий
+function calcArrLine(x,y,angleArr,scale=0.5)// расчитываем из массива углов массив линий
 {
     let arrLine=[];
     arrLine.push(calcLineInHuman(x,y,angleArr[0],
@@ -159,22 +163,61 @@ function drawAll()
 }
 function update()
 {
-     //updateLineHuman(100,263,1);
-     let time2=new Date().getTime();
-         
-        
-         time2=new Date().getTime();
-         if (time2-time> 150 )
-         {
-            selectFrame++;
-            selectFrame %= (actionBlue[0].length);
-            time=new Date().getTime();
-         };
-        //console.log(actionBlue[0][selectFrame]);
-        arrElemCopy(humanBlue.angleArr,actionBlue[0][selectFrame].angleArr);
-        humanBlue.x=actionBlue[0][selectFrame].xHuman;
-        humanBlue.y=actionBlue[0][selectFrame].yHuman;
-        humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
+	 //updateLineHuman(100,263,1);
+	let time2=new Date().getTime();
+	if (checkPressKey('ArrowRight') && SRBlue!=1)
+	{
+		SRBlue=1;
+	}
+	if (checkPressKey('ArrowLeft') && SRBlue!=2)
+	{
+		SRBlue=2;
+	}
+	if (checkPressKey('KeyS') && SRBlue!=3)
+	{
+		SRBlue=3;
+	}
+	if (selectFrame==actionBlue[SRBlue].length-1)
+	{
+		humanBlue.dx+=actionBlue[SRBlue][selectFrame].xHuman-100;
+		console.log(humanBlue.dx);
+	}
+	if (SRBlue!=0)
+	{
+		if (selectFrame==actionBlue[SRBlue].length-1)
+		{
+			SRBlue=0;
+			selectFrame=0;
+			humanBlue.numMoveFrame=null;
+			
+			
+		}
+	//	console.log(SRBlue+' '+ selectFrame);
+	}
+	
+	
+	
+	// if (actionBlue[SRBlue][selectFrame].xHuman!=100)
+	// {
+		// if (humanBlue.numMoveFrame != selectFrame)
+		// {
+			// humanBlue.x-=100-actionBlue[SRBlue][selectFrame].xHuman;
+	/* 		humanBlue.numMoveFrame = selectFrame;
+		}
+	}		
+	*/	
+	
+	arrElemCopy(humanBlue.angleArr,actionBlue[SRBlue][selectFrame].angleArr);
+	humanBlue.x=actionBlue[SRBlue][selectFrame].xHuman+humanBlue.dx;
+	humanBlue.y=actionBlue[SRBlue][selectFrame].yHuman;
+	humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
+	time2=new Date().getTime();
+    if (time2-time> 150 )
+	{
+		selectFrame++;
+		selectFrame %= (actionBlue[SRBlue].length);
+		time=new Date().getTime();
+	};
  }
 
 
