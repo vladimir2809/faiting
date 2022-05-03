@@ -2,7 +2,7 @@ var context;
 var canvas;
 var time=0;
 var selectFrame=0;
-var SRBlue=0;// выбор приема Blue
+var SRBlue=0;// выбор приема Blue select reception blue
 window.addEventListener('load', function () {
     preload();
     create();
@@ -134,10 +134,11 @@ function drawAll()
     context.fillStyle='rgb(210,210,210)';
     context.fillRect(0,0,canvas.width,canvas.height);// очистка экрана
     context.beginPath();
+    context.strokeStyle='rgb(0,0,0)';
     context.moveTo(1,canvas.height/2);
     context.lineTo(canvas.width,canvas.height/2 );
     context.stroke();
-    
+    context.strokeStyle='rgb(0,0,255)';
     for (let i=0;i<humanBlue.lineArr.length;i++)
     {
         let x=humanBlue.lineArr[i].x;
@@ -176,6 +177,14 @@ function update()
 	if (checkPressKey('KeyS') && SRBlue!=3)
 	{
 		SRBlue=3;
+	}
+        if (checkPressKey('KeyA') && SRBlue!=4)
+	{
+		SRBlue=4;
+	}
+        if (checkPressKey('KeyD') && SRBlue!=5)
+	{
+		SRBlue=5;
 	}
 	if (selectFrame==actionBlue[SRBlue].length-1)
 	{
