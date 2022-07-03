@@ -1,8 +1,7 @@
 var context;
 var canvas;
-var time=0;
-var selectFrame=0;
-var SRBlue=0;// выбор приема Blue select reception blue
+var timeNow = 0;
+//var SRBRed=0;// выбор приема Blue select reception blue
 window.addEventListener('load', function () {
     preload();
     create();
@@ -38,10 +37,47 @@ var Line={
 var humanBlue={
     x:100,
     y:263,
+    xBuffer:100,
+    xStart:100,
 	dx:0,
 	dy:0,
 	numMoveFrame:null,
     numAction:0,
+    selectFrame:0,
+    SR: 0,// выбор приема
+    time:0,
+    xTime:0,
+    timeNow:0,
+    angleArr:[
+        -90,
+        45,
+        135,
+        90,
+        90,
+        45,
+        135,
+        -15,
+        -15,
+        -90
+    ],
+
+    lineArr:[],
+    
+}
+var humanRed={
+    x:500,
+    y:263,
+    xBuffer:500,
+    xStart:500,
+	dx:0,
+	dy:0,
+	numMoveFrame:null,
+    numAction:0,
+    selectFrame:0,
+    SR: 0,// выбор приема
+    time:0,
+    xTime:0,
+    timeNow:0,
     angleArr:[
         -90,
         45,
@@ -69,7 +105,10 @@ function create()
     initKeyboardAndMouse(['ArrowLeft','Space','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
                             ,"KeyD","KeyS","KeyA"]);
-    humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
+    humanBlue.lineArr=calcArrLine(10,10/*humanBlue.x,humanBlue.y*/,humanBlue.angleArr);
+    humanRed.lineArr=calcArrLine(humanRed.x,humanRed.y,humanRed.angleArr);
+    humanBlue.xStart = humanBlue.xBuffer = actionBlue[0][0].xHuman;
+    humanRed.xStart = humanRed.xBuffer = actionRed[0][0].xHuman;
 }
 function calcLineInHuman(x,y,angle,length)// добавить линию 
 {
@@ -98,9 +137,7 @@ function calcArrLine(x,y,angleArr,scale=0.5)// расчитываем из ма�
     arrLine.push(calcLineInHuman(x,y,angleArr[2],
                     dataLine.lengthArr[2]*scale));
     ///4
-    arrLine.push(calcLineInHuman(arrLine[1].x1,arrLine[1].y1,
-                    filtrAngle(angleArr[3]),
-                    dataLine.lengthArr[3]*scale));
+    arrLine.push(calcLineInHuman(arrLine[1].x1,arrLine[1].y1, filtrAngle(angleArr[3]),dataLine.lengthArr[3]*scale));
     //5
     arrLine.push(calcLineInHuman(arrLine[2].x1,arrLine[2].y1,
                     filtrAngle(angleArr[4]),
@@ -138,24 +175,52 @@ function drawAll()
     context.moveTo(1,canvas.height/2);
     context.lineTo(canvas.width,canvas.height/2 );
     context.stroke();
-    context.strokeStyle='rgb(0,0,255)';
+    //context.strokeStyle='rgb(0,0,255)';
+    drawHuman(humanBlue,'Blue');
+    drawHuman(humanRed,"Red");
+    //for (let i=0;i<humanBlue.lineArr.length;i++)
+    //{
+    //    let x=humanBlue.lineArr[i].x;
+    //    let y=humanBlue.lineArr[i].y;
+    //    let x1=humanBlue.lineArr[i].x1;
+    //    let y1=humanBlue.lineArr[i].y1;
+    //    context.beginPath();
+    //    context.moveTo(x,y);
+    //    context.lineTo(x1,y1 );
+    //    context.stroke();
+    //    if (i==humanBlue.lineArr.length-1)//рисуем голову
+    //    { 
+    //        let sizeHead=7;
+    //        let xx=Math.cos(pi*(humanBlue.angleArr[i])/180)*(sizeHead+humanBlue.lineArr[i].length)+
+    //                                    humanBlue.lineArr[i].x;
+    //        let yy=Math.sin(pi*(humanBlue.angleArr[i])/180)*(sizeHead+humanBlue.lineArr[i].length)+
+    //                                    humanBlue.lineArr[i].y;                    
+    //        context.beginPath()
+    //        context.arc(xx,yy, sizeHead,0,2*pi);
+    //        context.stroke();
+    //    }
+    //}
+}
+function drawHuman(human,color)
+{
+    context.strokeStyle=color;
     for (let i=0;i<humanBlue.lineArr.length;i++)
     {
-        let x=humanBlue.lineArr[i].x;
-        let y=humanBlue.lineArr[i].y;
-        let x1=humanBlue.lineArr[i].x1;
-        let y1=humanBlue.lineArr[i].y1;
+        let x=human.lineArr[i].x;
+        let y=human.lineArr[i].y;
+        let x1=human.lineArr[i].x1;
+        let y1=human.lineArr[i].y1;
         context.beginPath();
         context.moveTo(x,y);
         context.lineTo(x1,y1 );
         context.stroke();
-        if (i==humanBlue.lineArr.length-1)//рисуем голову
+        if (i==human.lineArr.length-1)//рисуем голову
         { 
             let sizeHead=7;
-            let xx=Math.cos(pi*(humanBlue.angleArr[i])/180)*(sizeHead+humanBlue.lineArr[i].length)+
-                                        humanBlue.lineArr[i].x;
-            let yy=Math.sin(pi*(humanBlue.angleArr[i])/180)*(sizeHead+humanBlue.lineArr[i].length)+
-                                        humanBlue.lineArr[i].y;                    
+            let xx=Math.cos(pi*(human.angleArr[i])/180)*(sizeHead+human.lineArr[i].length)+
+                                        human.lineArr[i].x;
+            let yy = Math.sin(pi * (human.angleArr[i]) / 180) * (sizeHead + human.lineArr[i].length) +
+                                        human.lineArr[i].y;                    
             context.beginPath()
             context.arc(xx,yy, sizeHead,0,2*pi);
             context.stroke();
@@ -165,68 +230,84 @@ function drawAll()
 function update()
 {
 	 //updateLineHuman(100,263,1);
-	let time2=new Date().getTime();
-	if (checkPressKey('ArrowRight') && SRBlue!=1)
+	timeNow=new Date().getTime();
+	if (checkPressKey('ArrowRight') && humanBlue.SR!=1)
 	{
-		SRBlue=1;
+		humanBlue.SR=1;
 	}
-	if (checkPressKey('ArrowLeft') && SRBlue!=2)
+	if (checkPressKey('ArrowLeft') && humanBlue.SR!=2)
 	{
-		SRBlue=2;
+		humanBlue.SR=2;
 	}
-	if (checkPressKey('KeyS') && SRBlue!=3)
+	if (checkPressKey('KeyS') && humanBlue.SR!=3)
 	{
-		SRBlue=3;
+		humanBlue.SR=3;
 	}
-        if (checkPressKey('KeyA') && SRBlue!=4)
+        if (checkPressKey('KeyA') && humanBlue.SR!=4)
 	{
-		SRBlue=4;
+		humanBlue.SR=4;
 	}
-        if (checkPressKey('KeyD') && SRBlue!=5)
+        if (checkPressKey('KeyD') && humanBlue.SR!=5)
 	{
-		SRBlue=5;
+		humanBlue.SR=5;
 	}
-	if (selectFrame==actionBlue[SRBlue].length-1)
-	{
-		humanBlue.dx+=actionBlue[SRBlue][selectFrame].xHuman-100;
-		console.log(humanBlue.dx);
-	}
-	if (SRBlue!=0)
-	{
-		if (selectFrame==actionBlue[SRBlue].length-1)
-		{
-			SRBlue=0;
-			selectFrame=0;
-			humanBlue.numMoveFrame=null;
-			
-			
-		}
-	//	console.log(SRBlue+' '+ selectFrame);
-	}
-	
-	
-	
-	// if (actionBlue[SRBlue][selectFrame].xHuman!=100)
-	// {
-		// if (humanBlue.numMoveFrame != selectFrame)
-		// {
-			// humanBlue.x-=100-actionBlue[SRBlue][selectFrame].xHuman;
-	/* 		humanBlue.numMoveFrame = selectFrame;
-		}
-	}		
-	*/	
-	
-	arrElemCopy(humanBlue.angleArr,actionBlue[SRBlue][selectFrame].angleArr);
-	humanBlue.x=actionBlue[SRBlue][selectFrame].xHuman+humanBlue.dx;
-	humanBlue.y=actionBlue[SRBlue][selectFrame].yHuman;
-	humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
-	time2=new Date().getTime();
-    if (time2-time> 150 )
-	{
-		selectFrame++;
-		selectFrame %= (actionBlue[SRBlue].length);
-		time=new Date().getTime();
-	};
+    if(humanRed.SR==0)humanRed.SR =randomInteger(0,100) < 10 ? randomInteger(1,5): 0;
+  
+    updateHuman(humanBlue, actionBlue);
+    updateHuman(humanRed, actionRed);
  }
+function updateHuman(human,actionList)
+{
 
+   
+    
+	if (human.selectFrame>=actionList[human.SR].length)
+	{
+		human.SR=0;
+        human.selectFrame = 0;
+	}
+	
+    if (human.selectFrame >0 /*&& human.SR>0*/ && human.selectFrame!=0)
+    {
+        human.xBuffer = actionList[human.SR][human.selectFrame ].xHuman-actionList[human.SR][human.selectFrame-1 ].xHuman;
+        //console.log("dx "+human.dx + ' SR ' + human.SR +" sF " +human.selectFrame);
+        if (human.xBuffer!=0)
+        {
+      
+                    
+            human.dx =human.xBuffer/5;
+         //   console.log(human.dx+'  '+human.selectFrame);
+          
+            human.xBuffer=0;
+        }
+        else
+        {
+            human.dx = 0;       
+            
+
+        }
+            
+
+    }
+    else
+    {
+        human.dx = 0;
+    }
+
+    arrElemCopy(human.angleArr,actionList[human.SR][human.selectFrame].angleArr);
+    human.timeNow=new Date().getTime();
+    if (human.timeNow-human.xTime> 1 )
+	{
+        human.x += human.dx;
+        human.xTime = new Date().getTime();;
+    }
+	human.lineArr=calcArrLine(Math.trunc(human.x),human.y,human.angleArr);
+	
+    if (human.timeNow-human.time> 100 )
+	{ 
+		human.selectFrame++;
+	    human.time=new Date().getTime();
+
+	};
+}
 
