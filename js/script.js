@@ -1,24 +1,16 @@
 var context;
 var canvas;
+var numOpt = 0;
 var screenWidth = 800;
 var screenHeight = 600;
 var timeNow = 0;
-//var SRBRed=0;// выбор приема Blue select reception blue
 var maxHpAndEnergy = 1000;
-var HPBlue = maxHpAndEnergy;
-var HPRed = maxHpAndEnergy ;
-var energyBlue = maxHpAndEnergy;
-var energyRed = maxHpAndEnergy;
 var gameOver = 0;// если 0 - игра продолжается, 1 - победил синий,2 - победил красный 
-window.addEventListener('load', function () {
-    preload();
-    setInterval(update,16); 
+window.addEventListener('load', function () { 
     create();
+    setInterval(update,16); 
     setInterval(drawAll,16);
 });
-var frameArr={
-    
-}
 var Line={
     x:null,
     y:null,
@@ -28,20 +20,6 @@ var Line={
     angle:0,
     select:false,
 }
-/* var dataLine={
-    lengthArr:[
-        30,
-        20,
-        20,
-        20,
-        20,
-        20,
-        20,
-        20,
-        20,
-        10,
-    ],
-} */
 var humanBlue;
 var humanRed;
 var Human={
@@ -78,46 +56,6 @@ var Human={
     lineArr:[],
     
 }
-//var bigText = {
-//    being:false,
-//    x:null,
-//    y:null,
-//    text:'',
-//}
-//var humanRed={
-//    x:500,
-//    y:263,
-//    xBuffer:500,
-//    xStart:500,
-//	dx:0,
-//	dy:0,
-//	numMoveFrame:null,
-//    numAction:0,
-//    selectFrame:0,
-//    SR: 0,// выбор приема
-//    time:0,
-//    xTime:0,
-//    timeNow:0,
-//    angleArr:[
-//        -90,
-//        45,
-//        135,
-//        90,
-//        90,
-//        45,
-//        135,
-//        -15,
-//        -15,
-//        -90
-//    ],
-
-//    lineArr:[],
-    
-//}
-function preload()
-{
-    
-}
 function create()
 {
     canvas = document.getElementById("canvas");
@@ -134,10 +72,10 @@ function create()
     humanRed.lineArr=calcArrLine(humanRed.x,humanRed.y,humanRed.angleArr);
     humanBlue.xStart = humanBlue.xBuffer = actionBlue[0][0].xHuman;
     humanRed.xStart = humanRed.xBuffer = actionRed[0][0].xHuman;
-    HPBlue = maxHpAndEnergy;//* 0.1;
-    HPRed = maxHpAndEnergy;//* 0.1;
-    energyBlue = maxHpAndEnergy;
-    energyRed = maxHpAndEnergy;
+    humanBlue.HP = maxHpAndEnergy;//* 0.1;
+    humanRed.HP = maxHpAndEnergy;//* 0.1;
+    humanBlue.energy = maxHpAndEnergy;
+    humanRed.energy = maxHpAndEnergy;
 }
 function calcLineInHuman(x,y,angle,length)// добавить линию 
 {
@@ -206,14 +144,14 @@ function drawAll()
     context.stroke();
     drawHuman(humanBlue,'Blue');
     drawHuman(humanRed, "Red");
-    //if (HPBlue >= 0) HPBlue -= 5.9; else HPBlue = maxHpAndEnergy;
-    //if (energyBlue >= 0) energyBlue -= 5.9; else energyBlue= maxHpAndEnergy;
+    //if (humanBlue.HP >= 0) humanBlue.HP -= 5.9; else humanBlue.HP = maxHpAndEnergy;
+    //if (humanBlue.energy >= 0) humanBlue.energy -= 5.9; else humanBlue.energy= maxHpAndEnergy;
     drawStrip(30, 30,  maxHpAndEnergy, maxHpAndEnergy, 0, 'Red');
-    drawStrip(30, 30, HPBlue, maxHpAndEnergy, 0, 'Green');
+    drawStrip(30, 30, humanBlue.HP, maxHpAndEnergy, 0, 'Green');
     drawStrip(screenWidth-screenWidth * 0.4 - 30, 30,  maxHpAndEnergy, maxHpAndEnergy, 0, 'Red');
-    drawStrip(screenWidth-screenWidth * 0.4 - 30, 30, HPRed, maxHpAndEnergy, 1, 'Green');
-    drawStrip(30, 7, energyBlue, maxHpAndEnergy, 0, 'Blue');
-    drawStrip(screenWidth-screenWidth * 0.4 - 30, 7, energyRed, maxHpAndEnergy, 1, 'Blue');
+    drawStrip(screenWidth-screenWidth * 0.4 - 30, 30, humanRed.HP, maxHpAndEnergy, 1, 'Green');
+    drawStrip(30, 7, humanBlue.energy, maxHpAndEnergy, 0, 'Blue');
+    drawStrip(screenWidth-screenWidth * 0.4 - 30, 7, humanRed.energy, maxHpAndEnergy, 1, 'Blue');
     if (gameOver!=0) 
     {
         let text = gameOver == 1 ? 'Победил синий' : 'Победил красный';
@@ -221,7 +159,7 @@ function drawAll()
         drawTextCenterScreen(text, "Arial", 40, color,screenHeight/2-30);
     }
 }
-function drawStrip(x,y,value,max,side,color)
+function drawStrip(x,y,value,max,side,color)// нарисовать полоску
 {
     context.fillStyle=color;
     let height = 20;
@@ -235,7 +173,7 @@ function drawStrip(x,y,value,max,side,color)
         if (max > 0 && value>0) context.fillRect(x+(width-(width * (value/max))), y, width * (value/max ), height);
     }
 }
-function drawHuman(human,color)
+function drawHuman(human,color)// нарисовать человека
 {
     context.strokeStyle=color;
     for (let i=0;i<humanBlue.lineArr.length;i++)
@@ -279,9 +217,10 @@ function update()
 {
 	 //updateLineHuman(100,263,1);
 	timeNow=new Date().getTime();
-    if (gameOver==0)
+    if (gameOver==0)// если игра идет
     {
         let dist = 35;
+        ///  если нажата кнопка на клавитатуре условие действия синего
 	    if (checkPressKey('ArrowRight') && humanBlue.SR!= 1&& humanBlue.x<humanRed.x-dist)
 	    {
 		    humanBlue.SR=1;
@@ -290,103 +229,95 @@ function update()
 	    {
 		    humanBlue.SR=2;
 	    }
-	    if (checkPressKey('KeyS') && humanBlue.SR!=3)
+	    if (keyUpDuration('KeyS',50) && humanBlue.SR!=3)
 	    {
 		    humanBlue.SR=3;
-            energyBlue -= 5;
+            humanBlue.energy -= option[numOpt].downEnergyPanch;
 	    }
-            if (checkPressKey('KeyA') && humanBlue.SR!=4)
+        if (keyUpDuration('KeyA',50) && humanBlue.SR!=4)
 	    {
 		    humanBlue.SR=4;
-            energyBlue -= 7;
+            humanBlue.energy -= option[numOpt].downEnergyKick;
 	    }
-            if (checkPressKey('KeyD') && humanBlue.SR!=5)
+        if (keyUpDuration('KeyD',50) && humanBlue.SR!=5)
 	    {
 		    humanBlue.SR=5;
-            energyBlue -= 10;
+            humanBlue.energy -= option[numOpt].downEnergyKickUp;
 	    }
+
+        // управление красным
         if (humanRed.SR == 0)
         {
             // randomInteger(0,100) < 10 ? randomInteger(3,5): 0;
-            if (energyRed>maxHpAndEnergy*0.5)   humanRed.SR = 1; else humanRed.SR = 2;
+            if (humanRed.energy>maxHpAndEnergy*0.5)   humanRed.SR = 1; else humanRed.SR = 2;
         }
         if (humanRed.SR == 1 && humanRed.x < humanBlue.x + dist) humanRed.SR = 0;
         if (humanRed.SR == 2 && humanRed.x >screenWidth-dist) humanRed.SR = 0;
         let rand = 0;
         if (humanRed.SR == 0 && humanRed.x < humanBlue.x + dist * 1.5) // условия атаки красным
         {
-            rand = randomInteger(0, 100) < 10 ? randomInteger(3, 5) : 0
-            if (rand==3)
+            rand = randomInteger(0, 100) < 100 ? randomInteger(3, 5) : 0
+            if (rand==3)// удар  рукой 
             {
-                energyRed -= 5;
+                humanRed.energy -= option[numOpt].downEnergyPanch;
             }
-            if (rand==4)
+            if (rand==4)/// удар ногой вперед
             {
-                energyRed -= 7;
+                humanRed.energy -= option[numOpt].downEnergyKick;
             }
-            if (rand==5)
+            if (rand==5)// удар ногой вверх
             {
-                energyRed -= 10;
+                humanRed.energy -= option[numOpt].downEnergyKickUp;
             }
             humanRed.SR = rand;
         }
-        updateHuman(humanBlue, actionBlue);
+        // обновление состойний человечков
+        updateHuman(humanBlue, actionBlue); 
         updateHuman(humanRed, actionRed);
         let mult = 1.5;
-        if (humanRed.hitMade==0)
+        if (humanRed.hitMade==0)// если красный ударий синего
         {
             if (humanBlue.SR == 3 && humanBlue.selectFrame == 2 && humanRed.x - humanBlue.x < dist * mult) 
             {
-                humanRed.downHP = 20; 
-                humanRed.hitMade = 1;
+                humanRed.downHP = option[numOpt].downHitPanch; 
             }
             if (humanBlue.SR == 4 && humanBlue.selectFrame == 2 && humanRed.x - humanBlue.x < dist * mult) 
             {
-                humanRed.downHP = 10;
-                if (energyRed > 10) humanRed.downEnergy = 20;
-                humanRed.hitMade = 1;
+                humanRed.downHP = option[numOpt].downHitKick; 
+                if (humanRed.energy > 10) humanRed.downEnergy = option[numOpt].downEnergyKickRival;
             }
             if (humanBlue.SR == 5 && humanBlue.selectFrame == 2 && humanRed.x - humanBlue.x < dist * mult) 
             {
-                humanRed.downHP = 50;
-                humanRed.hitMade = 1;
+                humanRed.downHP = option[numOpt].downHitKickUp;
             }  
+            if (humanRed.downHP>0) humanRed.hitMade = 1;
         }
-        if(humanBlue.hitMade==0)
+        if(humanBlue.hitMade==0) // если синий ударил красного
         {
             if (humanRed.SR == 3 && humanRed.selectFrame == 2 && humanBlue.x - humanRed.x < dist * mult) 
             {
-                humanBlue.downHP = 20;
-                humanBlue.hitMade = 1;
+                humanBlue.downHP = option[numOpt].downHitPanch;
             }
             if (humanRed.SR == 4 && humanRed.selectFrame == 2 && humanBlue.x - humanRed.x < dist * mult) 
             {
-                humanBlue.downHP = 10; 
-                if (energyBlue > 10)humanBlue.downEnergy = 20;
-                humanBlue.hitMade = 1;
+                humanBlue.downHP = option[numOpt].downHitKick; 
+                if (humanBlue.energy > 10)humanBlue.downEnergy = option[numOpt].downEnergyKickRival;
             }
             if (humanRed.SR == 5 && humanRed.selectFrame == 2 && humanBlue.x - humanRed.x < dist * mult) 
             {
-                humanBlue.downHP = 50;
-                humanBlue.hitMade = 1;
+                humanBlue.downHP = option[numOpt].downHitKickUp;  
             }
+            if (humanBlue.downHP > 0)  humanBlue.hitMade = 1;
         } 
-        let mult2 = 0.5;
-        if (humanBlue.SR==0)
-        {
-            if (energyBlue < maxHpAndEnergy) energyBlue += 1 * mult2; else energyBlue = maxHpAndEnergy;
-        }
-        if (humanRed.SR==0)
-        {
-            if (energyRed < maxHpAndEnergy) energyRed += 1 * mult2; else energyRed = maxHpAndEnergy;
-        }
-        //console.log(humanBlue.hitMade);
+      
+        // сброс флага атаки 
         if (humanBlue.SR == 0 && humanBlue.selectFrame == 0) humanRed.hitMade = 0;
         if (humanRed.SR == 0 && humanRed.selectFrame == 0) humanBlue.hitMade = 0;
-        if (HPBlue <= 0) gameOver = 2;
-        if (HPRed <= 0) gameOver = 1;
+        // условие конца игры
+        if (humanBlue.HP <= 0) gameOver = 2;
+        if (humanRed.HP <= 0) gameOver = 1;
     }
-    if (gameOver!=0)
+    if (gameOver!=0) // если игра закончена
     {
         if (checkPressKey('Space')==true)
         {
@@ -394,8 +325,6 @@ function update()
             create();
         }
     }
-    //if (humanRed.hitMade==2) humanRed.hitMade = 0;
-    //if (humanBlue.hitMade==2) humanBlue.hitMade = 0;
 
  }
 function updateHuman(human,actionList)
@@ -403,12 +332,12 @@ function updateHuman(human,actionList)
 
    
     
-	if (human.selectFrame>=actionList[human.SR].length)
+	if (human.selectFrame>=actionList[human.SR].length) // если выбранный кадр больше или равно кадрам в приеме
 	{
 		human.SR=0;
         human.selectFrame = 0;
 	}
-	
+	// обработка перемещения
     if (human.selectFrame >0 /*&& human.SR>0*/ && human.selectFrame!=0)
     {
         human.xBuffer = actionList[human.SR][human.selectFrame ].xHuman-actionList[human.SR][human.selectFrame-1 ].xHuman;
@@ -431,41 +360,35 @@ function updateHuman(human,actionList)
     let summSpeed = 0;
     let mult = 0.25;
     let add = 30;
-    if (human.name == 'Red') human.speed = add + energyRed * mult;
-    if (human.name == 'Blue') human.speed = add + energyBlue * mult;
-
+    let mult2 = 0.5;
+    // востановление энергии при бездействии
+    if (humanBlue.SR==0)
+    {
+        if (human.energy < maxHpAndEnergy) human.energy += 1 * mult2; else human.energy = maxHpAndEnergy;
+    }
+    human.speed = add + human.energy * mult;
     summSpeed = add + maxHpAndEnergy * mult;
     arrElemCopy(human.angleArr,actionList[human.SR][human.selectFrame].angleArr);
 	human.lineArr=calcArrLine(Math.trunc(human.x),human.y,human.angleArr);
     human.timeNow=new Date().getTime();
-	if (human.timeNow-human.xTime> (summSpeed*5)/(human.speed+1) )
+	if (human.timeNow-human.xTime> (summSpeed*5)/(human.speed+1) )// время на  обновление при ходьбе
 	{
         human.x += human.dx;
         human.xTime = new Date().getTime();;
     }
-    if (human.timeNow-human.time> (summSpeed*50)/(human.speed+1) )
+    if (human.timeNow-human.time> (summSpeed*50)/(human.speed+1) )// время обновления кадара анимации
 	{ 
 		human.selectFrame++;
     
 	    human.time=new Date().getTime();
 
 	}
-    if ((human.downHP>0 || human.downEnergy>0) && human.hitMade==1)
+    if ((human.downHP>0 || human.downEnergy>0) && human.hitMade==1)// если было попадание при ударе
     {
-        if (human.name=='Red')
-        {
-            HPRed -= human.downHP;
-            energyRed -= human.downEnergy;
-            human.downHP = 0;
-            human.downEnergy = 0;
-        }
-        if (human.name=='Blue')
-        {
-            HPBlue -= human.downHP;
-            energyBlue -= human.downEnergy;
-            human.downHP = 0;
-            human.downEnergy = 0;
-        }
+        human.HP -= human.downHP;
+        human.energy -= human.downEnergy;
+        human.downHP = 0;
+        human.downEnergy = 0;
         human.hitMade = 2; //alert(585);
         human.timeHitMe = new Date().getTime();;
     }
