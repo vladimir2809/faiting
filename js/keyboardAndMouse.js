@@ -10,7 +10,7 @@ var mouseClick=false;
 var wheelDelta=0;
 function initKeyboardAndMouse(keyArr)// инициализировать переменные для работы с клавиатурой и мышью
 {
-    window.addEventListener('keydown', function () {
+    window.addEventListener('keydown', function (event) {
           gameKeyArr=keyArr;//["KeyA","KeyS","KeyD","KeyW",'ArrowLeft','ArrowRight','ArrowUp','ArrowDown' ]; 
           
           if (checkElemArr(gameKeyArr,event.code)==true &&
@@ -18,7 +18,7 @@ function initKeyboardAndMouse(keyArr)// инициализировать пер�
           {
               pressKeyArr.push(event.code);
           }
-          // console.log(pressKeyArr);
+           console.log(gameKeyArr);
     });
     window.addEventListener('keyup', function () {
           deleteElemArr(pressKeyArr,event.code);

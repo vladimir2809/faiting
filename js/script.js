@@ -6,6 +6,9 @@ var screenHeight = 600;
 var timeNow = 0;
 var maxHpAndEnergy = 1000;
 var gameOver = 0;// если 0 - игра продолжается, 1 - победил синий,2 - победил красный 
+var imageHuman=null;
+var modeGame='fight';
+var imageArr=[];
 window.addEventListener('load', function () { 
     create();
     setInterval(update,16); 
@@ -62,7 +65,33 @@ function create()
     context = canvas.getContext("2d");
     initKeyboardAndMouse(['ArrowLeft','Space','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
-                            ,"KeyD","KeyS","KeyA"]);
+                            ,"KeyD","KeyS","KeyA","KeyM"]); 
+    imageHuman= new Image();
+    imageHuman.src = 'img/imageHuman.png';
+    imageHuman.onload = function () {
+        console.log ('Изображение human успешно загружено!');
+        //imageLoad = true;
+    } 
+    imageHuman.onerror = function () {
+        alert("во время загрузки произошла ошибка");
+        //alert(pair[0].name);
+
+    } 
+    for (let i=0;i<7;i++)
+    {
+        imageArr[i]=new Image();
+        imageArr[i].src='img/image'+(i+1)+'.png';
+        imageArr[i].onload=function(){
+            console.log ('Изображение image'+(i+1)+' успешно загружено!');
+        }
+        imageArr[i].onerror = function () {
+            alert("во время загрузки произошла ошибка");
+            //alert(pair[0].name);
+    
+        }
+        
+    }
+    city.init(imageArr,imageHuman);
     humanBlue=JSON.parse(JSON.stringify(Human));
     humanRed=JSON.parse(JSON.stringify(Human));
     humanRed.x = 300;
@@ -134,29 +163,35 @@ function calcArrLine(x,y,angleArr,scale=0.5)// расчитываем из ма�
 }
 function drawAll()
 {
-
-    context.fillStyle='rgb(210,210,210)';
-    context.fillRect(0,0,canvas.width,canvas.height);// очистка экрана
-    context.beginPath();
-    context.strokeStyle='rgb(0,0,0)';
-    context.moveTo(1,canvas.height/2);
-    context.lineTo(canvas.width,canvas.height/2 );
-    context.stroke();
-    drawHuman(humanBlue,'Blue');
-    drawHuman(humanRed, "Red");
-    //if (humanBlue.HP >= 0) humanBlue.HP -= 5.9; else humanBlue.HP = maxHpAndEnergy;
-    //if (humanBlue.energy >= 0) humanBlue.energy -= 5.9; else humanBlue.energy= maxHpAndEnergy;
-    drawStrip(30, 30,  maxHpAndEnergy, maxHpAndEnergy, 0, 'Red');
-    drawStrip(30, 30, humanBlue.HP, maxHpAndEnergy, 0, 'Green');
-    drawStrip(screenWidth-screenWidth * 0.4 - 30, 30,  maxHpAndEnergy, maxHpAndEnergy, 0, 'Red');
-    drawStrip(screenWidth-screenWidth * 0.4 - 30, 30, humanRed.HP, maxHpAndEnergy, 1, 'Green');
-    drawStrip(30, 7, humanBlue.energy, maxHpAndEnergy, 0, 'Blue');
-    drawStrip(screenWidth-screenWidth * 0.4 - 30, 7, humanRed.energy, maxHpAndEnergy, 1, 'Blue');
-    if (gameOver!=0) 
+    if (city.open==false)
+    {  
+        context.fillStyle='rgb(210,210,210)';
+        context.fillRect(0,0,canvas.width,canvas.height);// очистка экрана
+        context.beginPath();
+        context.strokeStyle='rgb(0,0,0)';
+        context.moveTo(1,canvas.height/2);
+        context.lineTo(canvas.width,canvas.height/2 );
+        context.stroke();
+        drawHuman(humanBlue,'Blue');
+        drawHuman(humanRed, "Red");
+        context.drawImage(imageHuman,100,100);
+        //if (humanBlue.HP >= 0) humanBlue.HP -= 5.9; else humanBlue.HP = maxHpAndEnergy;
+        //if (humanBlue.energy >= 0) humanBlue.energy -= 5.9; else humanBlue.energy= maxHpAndEnergy;
+        drawStrip(30, 30,  maxHpAndEnergy, maxHpAndEnergy, 0, 'Red');
+        drawStrip(30, 30, humanBlue.HP, maxHpAndEnergy, 0, 'Green');
+        drawStrip(screenWidth-screenWidth * 0.4 - 30, 30,  maxHpAndEnergy, maxHpAndEnergy, 0, 'Red');
+        drawStrip(screenWidth-screenWidth * 0.4 - 30, 30, humanRed.HP, maxHpAndEnergy, 1, 'Green');
+        drawStrip(30, 7, humanBlue.energy, maxHpAndEnergy, 0, 'Blue');
+        drawStrip(screenWidth-screenWidth * 0.4 - 30, 7, humanRed.energy, maxHpAndEnergy, 1, 'Blue');
+        if (gameOver!=0) 
+        {
+            let text = gameOver == 1 ? 'Победил синий' : 'Победил красный';
+            let color = gameOver == 1 ? "Blue" : "Red";
+            drawTextCenterScreen(text, "Arial", 40, color,screenHeight/2-30);
+        }
+    }else if (city.open==true)
     {
-        let text = gameOver == 1 ? 'Победил синий' : 'Победил красный';
-        let color = gameOver == 1 ? "Blue" : "Red";
-        drawTextCenterScreen(text, "Arial", 40, color,screenHeight/2-30);
+        city.drawAll();
     }
 }
 function drawStrip(x,y,value,max,side,color)// нарисовать полоску
@@ -217,7 +252,15 @@ function update()
 {
 	 //updateLineHuman(100,263,1);
 	timeNow=new Date().getTime();
-    if (gameOver==0)// если игра идет
+    if (keyUpDuration('KeyM',500))
+    {
+        alert(565);
+        modeGame='city';
+        
+        city.start();
+
+    }
+    if (gameOver==0 && city.open==false)// если игра идет
     {
         let dist = 35;
         ///  если нажата кнопка на клавитатуре условие действия синего
