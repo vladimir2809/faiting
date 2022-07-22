@@ -254,7 +254,7 @@ function update()
 	timeNow=new Date().getTime();
     if (keyUpDuration('KeyM',500))
     {
-        alert(565);
+       // alert(565);
         modeGame='city';
         
         city.start();
@@ -405,9 +405,10 @@ function updateHuman(human,actionList)
     let add = 30;
     let mult2 = 0.5;
     // востановление энергии при бездействии
-    if (humanBlue.SR==0)
+    if (human.SR==0)
     {
-        if (human.energy < maxHpAndEnergy) human.energy += 1 * mult2; else human.energy = maxHpAndEnergy;
+        if (human.energy < maxHpAndEnergy) human.energy += 1 * mult2;
+        else human.energy = maxHpAndEnergy;
     }
     human.speed = add + human.energy * mult;
     summSpeed = add + maxHpAndEnergy * mult;
