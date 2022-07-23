@@ -24,7 +24,7 @@ var optionCity=[
         list: [{str:'тренироваться самому 1 час',price:10,addParam:[1,0,0]},
             {str:'тренироваться самому 2 часа',price:20,addParam:[2,0,0]},
             {str:'тренировка с тренером 1 час',price:45,addParam:[5,0,0]},
-            {str:'тренировка с трениром 2 часа',price:80,addParam:[10,0,0]}, 
+            {str:'тренировка с трениром 2 часа',price:280,addParam:[10,0,0]}, 
         ]        
     },
     {
@@ -64,4 +64,9 @@ var optionCity=[
         ]        
     },
         
+];
+var optionHuman=[
+    {name:"Brad", power:10,endurance:8,speedMove:15,},
+    {name:"Maks", power:15,endurance:18,speedMove:3,},
+    {name:"Victor", power:20,endurance:8,speedMove:15,},
 ];

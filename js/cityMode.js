@@ -1,4 +1,3 @@
-
 var building={
     name:'',
     x:null,
@@ -49,6 +48,7 @@ var windowSelect={
     close:function()
     {
         this.being=false;
+        resetMouseLeft();
     },
     draw:function(){
         context.fillStyle="#8888FF";
@@ -93,11 +93,20 @@ var windowSelect={
         for (let j = 0; j < optionCity[this.numBuilding].list.length;j++)
         {
         
-            context.fillText(optionCity[this.numBuilding].list[j].str,this.xText,
-                            this.yText+this.dyText*j);
-            context.fillText(optionCity[this.numBuilding].list[j].price+'$',
-                                this.x+this.width-50,
+            context.fillText(optionCity[this.numBuilding].list[j].str,this.xText+10,
+                            this.yText+this.dyText*j); 
+            let text2=optionCity[this.numBuilding].list[j].price+'';
+            let metrics2 = context.measureText(text2);
+            if (optionCity[this.numBuilding].name=='nightClub')
+            {
+                context.fillText('за +'+text2+'$',this.x+this.width-metrics2.width-70,
                                 this.yText+this.dyText*j);
+            }
+            else
+            {
+                context.fillText(text2+'$',this.x+this.width-metrics2.width-20,
+                                this.yText+this.dyText*j);
+            }
         }
        
         
@@ -163,7 +172,8 @@ var windowSelect={
     },
     addParamHuman:function(numBuilding,numSelect){
         if (optionCity[numBuilding].name!='nightClub'&&
-            optionCity[numBuilding].name!='arena')
+            optionCity[numBuilding].name!='arena'&&
+            money>=optionCity[numBuilding].list[numSelect].price)
         {
             let count=0;
             for(index in humanPlayerParam)
@@ -171,8 +181,10 @@ var windowSelect={
                 humanPlayerParam[index]+=optionCity[numBuilding].list[numSelect].addParam[count];
                 count++;
             }
+            money-=optionCity[numBuilding].list[numSelect].price;
+            day++;
         }
-    }
+    },
 }
 
 var city={
@@ -207,6 +219,7 @@ var city={
 
         }
         console.log(buildingArr);
+        resetMouseLeft();
     },
     start:function (){
         this.open=true;
@@ -222,7 +235,7 @@ var city={
         this.open=false;
         clearInterval(this.timerId);
     },
-    drawAll:function ()
+    draw:function ()
     {
         context.fillStyle="#000000";
         context.fillRect(this.x,this.y,this.width,this.height);
@@ -243,8 +256,10 @@ var city={
         context.fillText("Сила: "+humanPlayerParam.power,x,y);
         context.fillText("Выносливость: "+humanPlayerParam.endurance,x,y+dx);
         context.fillText("Скорость: "+humanPlayerParam.speedMove,x,y+dx*2);
-        
-        
+        context.fillStyle = 'rgb(0,255,0)';
+        context.font = '25px Arial';
+        context.fillText(money+'$',this.x+this.width-100,50);
+        context.fillText("День: "+day,this.x+this.width-300,50);
         if (this.mode=='select')
         {
             windowSelect.draw();
