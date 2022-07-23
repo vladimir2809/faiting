@@ -9,6 +9,13 @@ var gameOver = 0;// если 0 - игра продолжается, 1 - побе
 var imageHuman=null;
 var modeGame='fight';
 var imageArr=[];
+var humanPlayerParam={
+    power:10,// сила втаки
+    endurance:8,// выносливость
+    speedMove:15,// скорость движений
+
+
+};
 window.addEventListener('load', function () { 
     create();
     setInterval(update,16); 
@@ -35,6 +42,9 @@ var Human={
     timeHitMe: 0,
 	dx:0,
 	dy:0,
+    power:null,// сила втаки
+    endurance:null,// выносливость
+    speedMove:null,// скорость движений
     speed: 100,
     downHP: 0,
     downEnergy:0,
@@ -63,7 +73,7 @@ function create()
 {
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
-    initKeyboardAndMouse(['ArrowLeft','Space','ArrowRight',
+    initKeyboardAndMouse(['ArrowLeft','Space','Enter','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
                             ,"KeyD","KeyS","KeyA","KeyM"]); 
     imageHuman= new Image();
@@ -77,7 +87,7 @@ function create()
         //alert(pair[0].name);
 
     } 
-    for (let i=0;i<7;i++)
+    for (let i=0;i<5;i++)
     {
         imageArr[i]=new Image();
         imageArr[i].src='img/image'+(i+1)+'.png';
@@ -105,6 +115,17 @@ function create()
     humanRed.HP = maxHpAndEnergy;//* 0.1;
     humanBlue.energy = maxHpAndEnergy;
     humanRed.energy = maxHpAndEnergy;
+    for (let index in humanPlayerParam)
+    {
+        for (let indexHuman in humanBlue)
+        {
+            if (index==indexHuman)
+            {
+                humanBlue[indexHuman]=humanPlayerParam[index];
+            }
+        }
+    }
+    console.log(humanBlue);
 }
 function calcLineInHuman(x,y,angle,length)// добавить линию 
 {
