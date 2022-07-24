@@ -199,13 +199,15 @@ var windowSelect={
             this.close();
             city.close();
         }
-        else if (buildingArr[numBuilding].name=="arena")
+        else if (buildingArr[numBuilding].name=="arena"&&
+                money>=optionCity[numBuilding].list[numSelect].price)
         {
             modeGame='fightArena';
             modeGameOption.apply=false;
             modeGameOption.numSelect=numSelect;
             modeGameOption.countOponent=4;
             modeGameOption.numFight=1;
+            money-=optionCity[numBuilding].list[numSelect].price;
             
             this.close();
             city.close();

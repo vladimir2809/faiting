@@ -7,10 +7,12 @@ var screenHeight = 600;
 var timeNow = 0;
 var maxHpAndEnergy = 1000;
 var gameOver = 0;// если 0 - игра продолжается, 1 - победил синий,2 - победил красный 
+var gameOverTime=null;
 var imageHuman=null;
 var modeGame='fight';
 var countOponent=null;
 var numFight=null;
+var gameOverText='';
 var modeGameOption={
     countOponent:null,
     apply:false,
@@ -29,9 +31,9 @@ var maxParam={
 }
 
 var humanPlayerParam={
-    power:100,// сила втаки
-    endurance:80,// выносливость
-    speedMove:100,// скорость движений
+    power:1,// сила втаки
+    endurance:1,// выносливость
+    speedMove:1,// скорость движений
 
 
 };
@@ -178,6 +180,16 @@ function createHumansForFightClub()
     humanRed.HP = maxHpAndEnergy*randomInteger(1,60)/100;//* 0.1;
     //humanBlue.energy = maxHpAndEnergy;
     humanRed.energy = maxHpAndEnergy*randomInteger(1,60)/100;
+    for (let index in humanPlayerParam)
+    {
+        for (let indexHuman in humanBlue)
+        {
+            if (index==indexHuman)
+            {
+                humanBlue[indexHuman]=humanPlayerParam[index];
+            }
+        }
+    }
     for (let index in optionHuman[numOptHuman])
     {
         for (let indexHuman in humanRed)
@@ -195,7 +207,8 @@ function createHumansForFightArena()
     humanRed.x=screenWidth/2+screenWidth/8;
     humanBlue.name='Vladimir';
     //numFight=modeGameOption.numFight;
-    numOptHuman=randomInteger((numFight-1)*3,(numFight)*3-1);
+    let numSelect=modeGameOption.numSelect;
+    numOptHuman=(numSelect)*3+numFight-1;
     humanRed.name=optionHuman[numOptHuman].name;
 
     humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
@@ -206,6 +219,16 @@ function createHumansForFightArena()
     humanRed.HP = maxHpAndEnergy;//* 0.1;
     humanBlue.energy = maxHpAndEnergy;
     humanRed.energy = maxHpAndEnergy;
+    for (let index in humanPlayerParam)
+    {
+        for (let indexHuman in humanBlue)
+        {
+            if (index==indexHuman)
+            {
+                humanBlue[indexHuman]=humanPlayerParam[index];
+            }
+        }
+    }
     for (let index in optionHuman[numOptHuman])
     {
         for (let indexHuman in humanRed)
@@ -322,6 +345,12 @@ function drawAll()
             let text = gameOver == 1 ? 'Победил синий' : 'Победил красный';
             let color = gameOver == 1 ? "Blue" : "Red";
             drawTextCenterScreen(text, "Arial", 40, color,screenHeight/2-30);
+        }
+        if (gameOverText!='')
+        {
+            let color = gameOver == 1 ? "Blue" : "Red";
+            drawTextCenterScreen(gameOverText, "Arial", 30, color,screenHeight/2+10);
+
         }
     }else if (city.open==true)
     {
@@ -500,18 +529,88 @@ function update()
         if (humanBlue.SR == 0 && humanBlue.selectFrame == 0) humanRed.hitMade = 0;
         if (humanRed.SR == 0 && humanRed.selectFrame == 0) humanBlue.hitMade = 0;
         // условие конца игры
-        if (humanBlue.HP <= 0) {gameOver = 2; countWinRed++;}
-        if (humanRed.HP <= 0) {gameOver = 1; countWinBlue++;}
+        if (humanBlue.HP <= 0) 
+        {
+            gameOver = 2; 
+            countWinRed++;
+            if (modeGame=='fight')
+            {
+                gameOverText='Вы проиграли. Попробуйте еще раз!';
+            }
+            if (modeGame=='fightArena')
+            {
+                gameOverText='Вы проиграли. И едите обратно домой!';
+            }
+            if (modeGame=='fightClub')
+            {
+                gameOverText='Сегодня вам не удалось заработать денег.';
+            }
+        }
+        if (humanRed.HP <= 0) 
+        {
+            gameOver = 1;
+            if (modeGame=='fight')
+            {
+                let reward=100;
+                gameOverText='Это выша первая победа. '+reward+'$ теперь ваши.';
+            }
+            if (modeGame=='fightArena')
+            {
+                if (numFight<3)
+                {
+                    gameOverText='Вы прошли в следующий тур';
+                }
+                else
+                {
+                    let reward=optionCity[1].list[modeGameOption.numSelect].reward;
+                    gameOverText='Вы победитель турнира и забираете приз '+reward+'$';
+                }
+            }
+            if (modeGame=='fightClub')
+            {
+                
+                if (countOponent>1)
+                {
+                    let endText='';
+                    switch (countOponent-1)
+                    {
+                        case 1: endText="час"; break;
+                        case 2: case 3: case 4: endText="часa"; break;
+                        case 5: case 6: case 7: case 8: endText="часов"; break;
+                    }
+                    
+                    gameOverText='Вам осталось прорабатать '+(countOponent-1)+' '+endText;
+                }
+                else
+                {
+                    let reward=optionCity[2].list[modeGameOption.numSelect].price;
+                    gameOverText='Вы успешно отработали и заработали '+reward+'$';
+                }
+            }
+            countWinBlue++;
+        }
       //  console.log ('e Blue='+humanBlue.energy + ' e Red='+humanRed.energy + '');
         //console.log ('e Red='+humanRed.energy + '');
     }
     if (gameOver!=0) // если игра закончена
     {
-      //  if (checkPressKey('Space')==true)
+        let timeNow=new Date().getTime();;
+        if (gameOverTime==null)
         {
+            gameOverTime=timeNow;
+        }
+        if (checkPressKey('Space')==true || timeNow>gameOverTime+3000)
+        {
+            gameOverTime=null;
             if (gameOver==1)
             {
-               
+                gameOverText='';
+                if (modeGame=='fight' )
+                {
+                    money+=100;
+                    modeGame='city';
+                    city.start();     
+                }
                 if (modeGame=='fightClub' )
                 {
                     if (countOponent>0)
@@ -534,17 +633,39 @@ function update()
                 }
                 if (modeGame=='fightArena')
                 {
-                        console.log('dead');
-                    if (numFight<4)  numFight++;
-                    createHumansForFightArena();
+                    console.log('dead');
+                    if (numFight<3)
+                    {  
+                        numFight++;
+                        
+                        createHumansForFightArena();
+                    }
+                    else 
+                    {
+                       
+                        money+=optionCity[1].list[modeGameOption.numSelect].reward;
+                        
+                        day++;
+                        modeGame='city';
+                        city.start();  
+                    }
                 }
             
             }  
             else
             {
-                modeGame='city'
-                city.start();
-                day++;
+                gameOverText='';
+                if (modeGame=='fight')
+                {
+                        
+                    create();
+                }
+                else
+                {
+                    modeGame='city';
+                    city.start();
+                    day++;
+                }
             }
             gameOver = 0;
             //create();

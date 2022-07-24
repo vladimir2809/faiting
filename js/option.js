@@ -24,16 +24,16 @@ var optionCity=[
         list: [{str:'тренироваться самому 1 час',price:10,addParam:[1,0,0]},
             {str:'тренироваться самому 2 часа',price:20,addParam:[2,0,0]},
             {str:'тренировка с тренером 1 час',price:45,addParam:[5,0,0]},
-            {str:'тренировка с трениром 2 часа',price:280,addParam:[10,0,0]}, 
+            {str:'тренировка с тренером 2 часа',price:280,addParam:[10,0,0]}, 
         ]        
     },
     {
         name:arrNameBuilding[1],// арена
         nameLocal:"арена",
-        list: [{str:'турнир для новичков',price:10},
-            {str:'турнир для любителей',price:20},
-            {str:'турнир для профессионалов',price:45},
-            {str:'турнир для мастеров',price:80}, 
+        list: [{str:'турнир для новичков',price:10,reward:100},
+            {str:'турнир для любителей',price:20,reward:300},
+            {str:'турнир для профессионалов',price:45,reward:1000},
+            {str:'турнир для мастеров',price:80,reward:5000}, 
         ]        
     },
     {
@@ -68,7 +68,7 @@ var optionCity=[
 var optionHuman=[
     {name:"Brad", power:10,endurance:8,speedMove:15,},
     {name:"Maks", power:15,endurance:18,speedMove:3,},
-    {name:"Victor", power:2,endurance:8,speedMove:20,},
+    {name:"Victor", power:20,endurance:8,speedMove:20,},
 
     {name:"Sasha", power:18,endurance:15,speedMove:15,},
     {name:"Fred", power:15,endurance:28,speedMove:13,},
