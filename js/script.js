@@ -9,18 +9,33 @@ var maxHpAndEnergy = 1000;
 var gameOver = 0;// если 0 - игра продолжается, 1 - победил синий,2 - победил красный 
 var imageHuman=null;
 var modeGame='fight';
+var countOponent=null;
+var numFight=null;
+var modeGameOption={
+    countOponent:null,
+    apply:false,
+    numSelect:null,
+    numFight:null,
+}
 var countWinRed=0;
 var countWinBlue=0;
 var money=100;
 var day=1;
 var imageArr=[];
+var maxParam={
+    power:100,
+    endyrance:100,
+    speedMove:100,
+}
+
 var humanPlayerParam={
-    power:20,// сила втаки
+    power:100,// сила втаки
     endurance:80,// выносливость
-    speedMove:30,// скорость движений
+    speedMove:100,// скорость движений
 
 
 };
+
 window.addEventListener('load', function () { 
     create();
     setInterval(update,16); 
@@ -82,7 +97,7 @@ function create()
     srand(time);
     initKeyboardAndMouse(['ArrowLeft','Space','Enter','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
-                            ,"KeyD","KeyS","KeyA","KeyM"]); 
+                            ,"KeyD","KeyS","KeyA","KeyM",'NumpadAdd','NumpadSubtract']); 
     imageHuman= new Image();
     imageHuman.src = 'img/imageHuman.png';
     imageHuman.onload = function () {
@@ -111,7 +126,9 @@ function create()
     city.init(imageArr,imageHuman);
     humanBlue=JSON.parse(JSON.stringify(Human));
     humanRed=JSON.parse(JSON.stringify(Human));
-    humanRed.x = 300;
+    humanBlue.x=screenWidth/2-screenWidth/4;
+    humanRed.x=screenWidth/2+screenWidth/4;
+//    humanRed.x = 300;
     humanBlue.name='Vladimir';
     humanRed.name=optionHuman[numOptHuman].name;
 
@@ -144,6 +161,61 @@ function create()
         }
     }
     console.log(humanBlue);
+}
+function createHumansForFightClub()
+{
+    humanBlue.x=screenWidth/2-screenWidth/4;
+    humanRed.x=screenWidth/2+screenWidth/4;
+    humanBlue.name='Vladimir';
+    numOptHuman=randomInteger(0,6);
+    humanRed.name=optionHuman[numOptHuman].name;
+
+    humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
+    humanRed.lineArr=calcArrLine(humanRed.x,humanRed.y,humanRed.angleArr);
+    humanBlue.xStart = humanBlue.xBuffer = actionBlue[0][0].xHuman;
+    humanRed.xStart = humanRed.xBuffer = actionRed[0][0].xHuman;
+  //  humanBlue.HP = maxHpAndEnergy;//* 0.1;
+    humanRed.HP = maxHpAndEnergy*randomInteger(1,60)/100;//* 0.1;
+    //humanBlue.energy = maxHpAndEnergy;
+    humanRed.energy = maxHpAndEnergy*randomInteger(1,60)/100;
+    for (let index in optionHuman[numOptHuman])
+    {
+        for (let indexHuman in humanRed)
+        {
+            if (index==indexHuman)
+            {
+                humanRed[indexHuman]=optionHuman[numOptHuman][index];
+            }
+        }
+    }
+}
+function createHumansForFightArena()
+{
+    humanBlue.x=screenWidth/2-screenWidth/8;
+    humanRed.x=screenWidth/2+screenWidth/8;
+    humanBlue.name='Vladimir';
+    //numFight=modeGameOption.numFight;
+    numOptHuman=randomInteger((numFight-1)*3,(numFight)*3-1);
+    humanRed.name=optionHuman[numOptHuman].name;
+
+    humanBlue.lineArr=calcArrLine(humanBlue.x,humanBlue.y,humanBlue.angleArr);
+    humanRed.lineArr=calcArrLine(humanRed.x,humanRed.y,humanRed.angleArr);
+    humanBlue.xStart = humanBlue.xBuffer = actionBlue[0][0].xHuman;
+    humanRed.xStart = humanRed.xBuffer = actionRed[0][0].xHuman;
+    humanBlue.HP = maxHpAndEnergy;//* 0.1;
+    humanRed.HP = maxHpAndEnergy;//* 0.1;
+    humanBlue.energy = maxHpAndEnergy;
+    humanRed.energy = maxHpAndEnergy;
+    for (let index in optionHuman[numOptHuman])
+    {
+        for (let indexHuman in humanRed)
+        {
+            if (index==indexHuman)
+            {
+                humanRed[indexHuman]=optionHuman[numOptHuman][index];
+            }
+        }
+    }
 }
 function calcLineInHuman(x,y,angle,length)// добавить линию 
 {
@@ -322,12 +394,26 @@ function update()
         city.start();
 
     }
+    if (modeGame=='fightClub' && modeGameOption.apply==false)
+    {
+        countOponent=modeGameOption.countOponent;
+        modeGameOption.apply=true;
+        console.log('checking');
+        createHumansForFightClub();
+    }
+    if (modeGame=='fightArena' && modeGameOption.apply==false)
+    {
+        modeGameOption.apply=true;
+        numFight=modeGameOption.numFight;
+        createHumansForFightArena();
+    }
     if (gameOver==0 && city.open==false)// если игра идет
     {
-        let dist = null;
+        let dist = 35;
         ///  если нажата кнопка на клавитатуре условие действия синего
 	    if (checkPressKey('ArrowRight') && humanBlue.SR!= 1&& humanBlue.x<humanRed.x-dist)
 	    {
+       //     alert(5);
 		    humanBlue.SR=1;
 	    }
 	    if (checkPressKey('ArrowLeft') && humanBlue.SR!=2 && humanBlue.x>40)
@@ -349,11 +435,21 @@ function update()
 		    humanBlue.SR=5;
             humanBlue.energy -= option[numOpt].downEnergyKickUp;
 	    }
+        if (keyUpDuration('NumpadAdd',50))
+        {
+            humanBlue.speedMove+=10;
+            if (humanBlue.speedMove>100) humanBlue.speedMove=100;
 
+        }
+        if (keyUpDuration('NumpadSubtract',50))
+        {
+            humanBlue.speedMove-=10;
+            if (humanBlue.speedMove<1) humanBlue.speedMove=1;
+        }
         // управление красным
-        dist=humanRed.x-humanBlue.x;
-        controllHuman(humanRed,'red',dist);
-        controllHuman(humanBlue,'blue',dist);
+        let dist2=humanRed.x-humanBlue.x;
+        controllHuman(humanRed,'red',dist2);
+        controllHuman(humanBlue,'blue',dist2);
         // обновление состойний человечков
         updateHuman(humanBlue, actionBlue); 
         updateHuman(humanRed, actionRed);
@@ -413,8 +509,45 @@ function update()
     {
       //  if (checkPressKey('Space')==true)
         {
+            if (gameOver==1)
+            {
+               
+                if (modeGame=='fightClub' )
+                {
+                    if (countOponent>0)
+                    { 
+                        console.log(countOponent);
+                        countOponent--; 
+                        if (countOponent<=0)
+                        {
+                            let add=optionCity[2].list[modeGameOption.numSelect].price;
+                            money+=add;
+                            day++;
+                            modeGame='city';
+                            city.start();   
+                        }
+                        else
+                        {
+                            createHumansForFightClub();
+                        }
+                    }
+                }
+                if (modeGame=='fightArena')
+                {
+                        console.log('dead');
+                    if (numFight<4)  numFight++;
+                    createHumansForFightArena();
+                }
+            
+            }  
+            else
+            {
+                modeGame='city'
+                city.start();
+                day++;
+            }
             gameOver = 0;
-            create();
+            //create();
             //alert(555);
         }
     }
@@ -487,26 +620,32 @@ function updateHuman(human,actionList)
     }
     let summSpeed = 0;
     let mult = 0.25;
-    let add = 10;
-    let mult2 = 0.5;
+    
+    let mult2 = 0.15;
     // востановление энергии при бездействии
     if (human.SR==0)
     {
         if (human.energy < maxHpAndEnergy) human.energy += 1 * mult2;
         else human.energy = maxHpAndEnergy;
     }
-    human.speed = (add + human.energy)*((human.speedMove*5)/100) * mult;
-    summSpeed = (add + maxHpAndEnergy)*5* mult;
+    let a = maxHpAndEnergy/100;
+    let b = maxParam.speedMove/100;
+    let speedCalc=(b*3-b)+(b*3-b)*human.speedMove/maxParam.speedMove;
+    human.speed=(a*3-a)+(a*3-a)*human.energy/maxHpAndEnergy*speedCalc;
+    //human.speed = 100*(add / human.energy/maxHpAndEnergy);//*((human.speedMove*5)/100) * mult;
+    //human.speed*=2*human.speedMove/maxParam.speedMove ;
+    summSpeed = a*3;//(add *6   );
 
     arrElemCopy(human.angleArr,actionList[human.SR][human.selectFrame].angleArr);
 	human.lineArr=calcArrLine(Math.trunc(human.x),human.y,human.angleArr);
     human.timeNow=new Date().getTime();
-	if (human.timeNow-human.xTime> (summSpeed*5)/(human.speed+1) )// время на  обновление при ходьбе
+	if (human.timeNow-human.xTime> (summSpeed*3)/(human.speed+1) )// время на  обновление при ходьбе
 	{
         human.x += human.dx;
         human.xTime = new Date().getTime();;
+        
     }
-    if (human.timeNow-human.time> (summSpeed*50)/(human.speed+1) )// время обновления кадара анимации
+    if (human.timeNow-human.time> (summSpeed*300)/(human.speed+1) )// время обновления кадара анимации
 	{ 
 		human.selectFrame++;
     

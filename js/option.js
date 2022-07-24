@@ -68,5 +68,21 @@ var optionCity=[
 var optionHuman=[
     {name:"Brad", power:10,endurance:8,speedMove:15,},
     {name:"Maks", power:15,endurance:18,speedMove:3,},
-    {name:"Victor", power:20,endurance:8,speedMove:15,},
+    {name:"Victor", power:2,endurance:8,speedMove:20,},
+
+    {name:"Sasha", power:18,endurance:15,speedMove:15,},
+    {name:"Fred", power:15,endurance:28,speedMove:13,},
+    {name:"Nikola", power:20,endurance:28,speedMove:10,},
+
+    {name:"Artur", power:40,endurance:60,speedMove:30,},
+    {name:"Vadim", power:45,endurance:40,speedMove:50,},
+    {name:"Nike", power:60,endurance:50,speedMove:70,},
+
+    {name:"harry", power:95,endurance:90,speedMove:100,},
+    {name:"Thomas", power:100,endurance:90,speedMove:90,},
+    {name:"Oskar", power:95,endurance:95,speedMove:95,}, 
+    {name:"Jack", power:100,endurance:100,speedMove:100,},
+
+
+
 ];

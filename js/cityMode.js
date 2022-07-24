@@ -48,67 +48,70 @@ var windowSelect={
     close:function()
     {
         this.being=false;
+        clearInterval(this.timerId);
         resetMouseLeft();
     },
     draw:function(){
-        context.fillStyle="#8888FF";
-        context.fillRect(this.x,this.y,this.width,this.height);
-  
-        /*
-        let x=this.x+10;
-        let y=this.y+40;
-        let dy=30;
-        */
-      //  context.fillStyle=color;
-       // let heightText=fontSize;
-        context.beginPath();
-        context.fillStyle='rgb(0,255,0)';
-        context.font = '24px Arial';
-        let text='';
-
-        for (let i=0;i<optionCity.length;i++)
+        if (this.being==true)
         {
-            if (optionCity[i].name==this.name)
+            context.fillStyle="#8888FF";
+            context.fillRect(this.x,this.y,this.width,this.height);
+    
+            /*
+            let x=this.x+10;
+            let y=this.y+40;
+            let dy=30;
+            */
+        //  context.fillStyle=color;
+        // let heightText=fontSize;
+            context.beginPath();
+            context.fillStyle='rgb(0,255,0)';
+            context.font = '24px Arial';
+            let text='';
+
+            for (let i=0;i<optionCity.length;i++)
             {
-                text=optionCity[i].nameLocal;
-                break;
+                if (optionCity[i].name==this.name)
+                {
+                    text=optionCity[i].nameLocal;
+                    break;
+                }
             }
-        }
-        let metrics = context.measureText(text);
-        context.fillText(text, this.x + this.width / 2 - metrics.width / 2,this.y+30);
-        //console.log(this.name+' '+(this.x + this.width / 2 - metrics.width / 2)+' '+this.y+30);
-   ///     context.fillText(this.listSelect[i].str,this.xText,
-   //                         this.yText+this.dyText*i);
-        if (this.selectHover!=null)
-        {
-            context.fillStyle='rgb(255,255,0)';
-            context.fillRect(this.xText,
-                        this.yText+this.selectHover*this.dyText-this.dyText/3-this.yOffsetText,
-                        this.width-10/*-this.xText*/,this.dyText);
-        }     
+            let metrics = context.measureText(text);
+            context.fillText(text, this.x + this.width / 2 - metrics.width / 2,this.y+30);
+            //console.log(this.name+' '+(this.x + this.width / 2 - metrics.width / 2)+' '+this.y+30);
+    ///     context.fillText(this.listSelect[i].str,this.xText,
+    //                         this.yText+this.dyText*i);
+            if (this.selectHover!=null)
+            {
+                context.fillStyle='rgb(255,255,0)';
+                context.fillRect(this.xText,
+                            this.yText+this.selectHover*this.dyText-this.dyText/3-this.yOffsetText,
+                            this.width-10/*-this.xText*/,this.dyText);
+            }     
 
-        context.fillStyle = 'rgb(0,255,0)';
-        context.font = '24px Arial';
-       
-        for (let j = 0; j < optionCity[this.numBuilding].list.length;j++)
-        {
+            context.fillStyle = 'rgb(0,255,0)';
+            context.font = '24px Arial';
         
-            context.fillText(optionCity[this.numBuilding].list[j].str,this.xText+10,
-                            this.yText+this.dyText*j); 
-            let text2=optionCity[this.numBuilding].list[j].price+'';
-            let metrics2 = context.measureText(text2);
-            if (optionCity[this.numBuilding].name=='nightClub')
+            for (let j = 0; j < optionCity[this.numBuilding].list.length;j++)
             {
-                context.fillText('за +'+text2+'$',this.x+this.width-metrics2.width-70,
-                                this.yText+this.dyText*j);
-            }
-            else
-            {
-                context.fillText(text2+'$',this.x+this.width-metrics2.width-20,
-                                this.yText+this.dyText*j);
+            
+                context.fillText(optionCity[this.numBuilding].list[j].str,this.xText+10,
+                                this.yText+this.dyText*j); 
+                let text2=optionCity[this.numBuilding].list[j].price+'';
+                let metrics2 = context.measureText(text2);
+                if (optionCity[this.numBuilding].name=='nightClub')
+                {
+                    context.fillText('за +'+text2+'$',this.x+this.width-metrics2.width-70,
+                                    this.yText+this.dyText*j);
+                }
+                else
+                {
+                    context.fillText(text2+'$',this.x+this.width-metrics2.width-20,
+                                    this.yText+this.dyText*j);
+                }
             }
         }
-       
         
         // console.log(this.xText+' '+this.yText+' '+this.dyText);
        // console.log(this.x+' '+this.y+' '+this.width+' '+this.height);
@@ -127,7 +130,8 @@ var windowSelect={
                     if (mouseLeftClick()==true)
                     {
                         //alert(545); 
-                        this.addParamHuman(this.numBuilding,this.selectHover);
+                      //  this.addParamHuman(this.numBuilding,this.selectHover);
+                        this.applySelect(this.numBuilding,this.selectHover);
                     }
                 }
             }
@@ -158,7 +162,8 @@ var windowSelect={
             }
             if (keyUpDuration("Enter",100))
             {
-                this.addParamHuman(this.numBuilding,this.selectHover);
+                this.applySelect(this.numBuilding,this.selectHover);
+                
             }
 
         }
@@ -169,6 +174,43 @@ var windowSelect={
             city.mode='city';
         }
         //console.log('select');
+    },
+    applySelect:function(numBuilding,numSelect)
+    {
+        if (buildingArr[this.numBuilding].name=="rockingChair"||
+        buildingArr[this.numBuilding].name=="stadium"||
+        buildingArr[this.numBuilding].name=="martialSection")
+        {
+            this.addParamHuman(numBuilding,numSelect);
+        }
+        else if (buildingArr[numBuilding].name=="nightClub")
+        {
+            modeGame='fightClub';
+            switch (numSelect)
+            {
+                case 0: {modeGameOption.countOponent=1}break;
+                case 1: {modeGameOption.countOponent=2}break;
+                case 2: {modeGameOption.countOponent=4}break;
+                case 3: {modeGameOption.countOponent=8}break;
+            }
+            modeGameOption.apply=false;
+            modeGameOption.numSelect=numSelect;
+            console.log (modeGameOption.countOponent);
+            this.close();
+            city.close();
+        }
+        else if (buildingArr[numBuilding].name=="arena")
+        {
+            modeGame='fightArena';
+            modeGameOption.apply=false;
+            modeGameOption.numSelect=numSelect;
+            modeGameOption.countOponent=4;
+            modeGameOption.numFight=1;
+            
+            this.close();
+            city.close();
+        }
+
     },
     addParamHuman:function(numBuilding,numSelect){
         if (optionCity[numBuilding].name!='nightClub'&&
@@ -223,8 +265,12 @@ var city={
     },
     start:function (){
         this.open=true;
+        this.mode='city';
+        humanBlue.HP=maxHpAndEnergy;
+        humanBlue.energy=maxHpAndEnergy;
         if (this.open==true)  this.timerId=setInterval(function(){
             city.update();
+               
             
         },50);
     },
@@ -233,7 +279,7 @@ var city={
         clearInterval(this.timerId);
        // pause=false;
         this.open=false;
-        clearInterval(this.timerId);
+      //  clearInterval(this.timerId);
     },
     draw:function ()
     {
@@ -269,6 +315,7 @@ var city={
     update: function (){
         if (this.mode=='city' && mouseLeftClick()==true)
         {
+            console.log('start City');
             for (let i=0;i<buildingArr.length;i++)
             {
                 if (mouseX>(buildingArr[i].x*this.scale) &&
@@ -277,6 +324,7 @@ var city={
                     mouseY<(buildingArr[i].y+buildingArr[i].height)*this.scale )
                     {
                        //alert(buildingArr[i].name); 
+                          
                        windowSelect.start(buildingArr[i].name);
                        this.mode='select';
                     }
