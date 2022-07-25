@@ -13,6 +13,9 @@ var modeGame='fight';
 var countOponent=null;
 var numFight=null;
 var gameOverText='';
+// var countMove=0;
+// var countSR=0;
+var speedCount=0;
 var modeGameOption={
     countOponent:null,
     apply:false,
@@ -62,6 +65,7 @@ var Human={
     xStart:100,
     hitMade:0,// УДАР ПРОИЗВЕДЕН 
     timeHitMe: 0,
+    countMove:0,
 	dx:0,
 	dy:0,
     power:null,// сила втаки
@@ -99,7 +103,8 @@ function create()
     srand(time);
     initKeyboardAndMouse(['ArrowLeft','Space','Enter','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
-                            ,"KeyD","KeyS","KeyA","KeyM",'NumpadAdd','NumpadSubtract']); 
+                            ,"KeyD","KeyS","KeyA","KeyM",'NumpadAdd','NumpadSubtract',
+                        'Minus','Equal']); 
     imageHuman= new Image();
     imageHuman.src = 'img/imageHuman.png';
     imageHuman.onload = function () {
@@ -470,6 +475,17 @@ function update()
             if (humanBlue.speedMove>100) humanBlue.speedMove=100;
 
         }
+        if (keyUpDuration('Minus',50))
+        {
+            humanBlue.energy-=100;
+            if (humanBlue.energy<1) humanBlue.energy=1;
+        }
+        if (keyUpDuration('Equal',50))
+        {
+            humanBlue.energy+=100;
+            if (humanBlue.energy>maxHpAndEnergy) humanBlue.energy=maxHpAndEnergy;
+
+        }
         if (keyUpDuration('NumpadSubtract',50))
         {
             humanBlue.speedMove-=10;
@@ -716,17 +732,21 @@ function updateHuman(human,actionList)
     
 	if (human.selectFrame>=actionList[human.SR].length) // если выбранный кадр больше или равно кадрам в приеме
 	{
+
 		human.SR=0;
         human.selectFrame = 0;
+        
+        
 	}
 	// обработка перемещения
+    let devisorMove=3;// делитель для перемешения
     if (human.selectFrame >0 /*&& human.SR>0*/ && human.selectFrame!=0)
     {
         human.xBuffer = actionList[human.SR][human.selectFrame ].xHuman-actionList[human.SR][human.selectFrame-1 ].xHuman;
         //console.log("dx "+human.dx + ' SR ' + human.SR +" sF " +human.selectFrame);
         if (human.xBuffer!=0)
         {
-            human.dx =human.xBuffer/5;
+            human.dx =human.xBuffer/devisorMove;
          //   console.log(human.dx+'  '+human.selectFrame);
             human.xBuffer=0;
         }
@@ -740,18 +760,15 @@ function updateHuman(human,actionList)
         human.dx = 0;
     }
     let summSpeed = 0;
-    let mult = 0.25;
-    
-    let mult2 = 0.15;
     // востановление энергии при бездействии
     if (human.SR==0)
     {
-        if (human.energy < maxHpAndEnergy) human.energy += 1 * mult2;
+        if (human.energy < maxHpAndEnergy) human.energy += 1 *0.15;
         else human.energy = maxHpAndEnergy;
     }
     let a = maxHpAndEnergy/100;
     let b = maxParam.speedMove/100;
-    let speedCalc=(b*3-b)+(b*3-b)*human.speedMove/maxParam.speedMove;
+    let speedCalc=(b*2-b)+(b*2-b)*human.speedMove/maxParam.speedMove;
     human.speed=(a*3-a)+(a*3-a)*human.energy/maxHpAndEnergy*speedCalc;
     //human.speed = 100*(add / human.energy/maxHpAndEnergy);//*((human.speedMove*5)/100) * mult;
     //human.speed*=2*human.speedMove/maxParam.speedMove ;
@@ -759,20 +776,40 @@ function updateHuman(human,actionList)
 
     arrElemCopy(human.angleArr,actionList[human.SR][human.selectFrame].angleArr);
 	human.lineArr=calcArrLine(Math.trunc(human.x),human.y,human.angleArr);
+   
+    //speedCount=(summSpeed*40)/(human.speed+1);
     human.timeNow=new Date().getTime();
-	if (human.timeNow-human.xTime> (summSpeed*3)/(human.speed+1) )// время на  обновление при ходьбе
-	{
-        human.x += human.dx;
-        human.xTime = new Date().getTime();;
-        
-    }
-    if (human.timeNow-human.time> (summSpeed*300)/(human.speed+1) )// время обновления кадара анимации
-	{ 
-		human.selectFrame++;
-    
-	    human.time=new Date().getTime();
+    if (human.timeNow-human.time> (summSpeed*40)/(human.speed+1) && human.SR!=0)
+    {
+        if ((human.SR==1 || human.SR==2 ))
+        {
+            
+            if ( human.countMove<devisorMove)// обновление при ходьбе
+            {
+                //console.log(human.timeNow-human.time+'count Move='+countMove);
+                human.x += human.dx;   
+            }
+        }
+        if (human.countMove>=devisorMove)//  обновления кадра анимации
+        { 
+            human.selectFrame++;
+            human.countMove=0;
+            /*
+            if ((human.SR==1 || human.SR==2 )&& human.selectFrame>=actionList[human.SR].length) 
+            {
+                console.log('countMove='+countMove+" countSR="+countSR+' '+
+                            speedCount);
+                countMove=countSR=0;
+            }
+            */
+            //countSR++;
+            
 
-	}
+        }
+   
+        human.countMove++;
+        human.time = new Date().getTime();;
+    }
     if ((human.downHP>0 || human.downEnergy>0) && human.hitMade==1)// если было попадание при ударе
     {
         human.HP -= human.downHP;

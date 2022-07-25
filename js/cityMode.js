@@ -21,6 +21,13 @@ var windowSelect={
     yOffset:70,
     yOffsetText:12,     
     selectHover:null,
+    buttonExit:{
+        x:null,
+        y:null,
+        width:30,
+        height:30,
+        text:'X',
+    },
     start:function(name){
         this.being=true;
         this.name=name;
@@ -29,6 +36,8 @@ var windowSelect={
         this.y=screenHeight/2-this.height/2;
         this.xText=this.x+this.xOffset;
         this.yText=this.y+this.yOffset;
+        this.buttonExit.x=this.x+this.width-this.buttonExit.width;
+        this.buttonExit.y=this.y;
         resetMouseLeft();
         for (let i=0;i<optionCity.length;i++)
         {
@@ -49,6 +58,9 @@ var windowSelect={
     {
         this.being=false;
         clearInterval(this.timerId);
+        //clearInterval(this.timerId);
+        city.mode='city';
+        //mode='city';
         resetMouseLeft();
     },
     draw:function(){
@@ -111,6 +123,11 @@ var windowSelect={
                                     this.yText+this.dyText*j);
                 }
             }
+            context.fillStyle="#FFFF00";
+            context.fillRect(this.buttonExit.x,this.buttonExit.y,
+                            this.buttonExit.width,this.buttonExit.height);
+            context.fillStyle="#FF0000";
+            context.fillText(this.buttonExit.text,this.buttonExit.x+7,this.buttonExit.y+23);
         }
         
         // console.log(this.xText+' '+this.yText+' '+this.dyText);
@@ -132,6 +149,14 @@ var windowSelect={
                         //alert(545); 
                       //  this.addParamHuman(this.numBuilding,this.selectHover);
                         this.applySelect(this.numBuilding,this.selectHover);
+                    }
+                }
+                if (mouseX>this.buttonExit.x && mouseX<this.buttonExit.x+this.buttonExit.width&&
+                    mouseY>this.buttonExit.y && mouseY<this.buttonExit.y+this.buttonExit.height)
+                {
+                    if (mouseLeftClick()==true)
+                    {
+                        this.close();
                     }
                 }
             }
@@ -170,8 +195,7 @@ var windowSelect={
         if (keyUpDuration("Escape",100))
         {
             this.close();
-            clearInterval(this.timerId);
-            city.mode='city';
+           
         }
         //console.log('select');
     },

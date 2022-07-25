@@ -18,7 +18,7 @@ function initKeyboardAndMouse(keyArr)// инициализировать пер�
           {
               pressKeyArr.push(event.code);
           }
-           console.log(gameKeyArr);
+           //console.log(gameKeyArr);
     });
     window.addEventListener('keyup', function () {
           deleteElemArr(pressKeyArr,event.code);
