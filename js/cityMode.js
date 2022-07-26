@@ -21,6 +21,8 @@ var windowSelect={
     yOffset:70,
     yOffsetText:12,     
     selectHover:null,
+    textPrompt:"",
+    timeTextPrompt:null,
     buttonExit:{
         x:null,
         y:null,
@@ -38,7 +40,9 @@ var windowSelect={
         this.yText=this.y+this.yOffset;
         this.buttonExit.x=this.x+this.width-this.buttonExit.width;
         this.buttonExit.y=this.y;
+        this.textPrompt='';
         resetMouseLeft();
+        
         for (let i=0;i<optionCity.length;i++)
         {
             if (optionCity[i].name==this.name)
@@ -128,6 +132,12 @@ var windowSelect={
                             this.buttonExit.width,this.buttonExit.height);
             context.fillStyle="#FF0000";
             context.fillText(this.buttonExit.text,this.buttonExit.x+7,this.buttonExit.y+23);
+            if (this.textPrompt!='')
+            {
+                context.fillStyle="#FFFFFF";
+                context.font = '24px Arial';
+                context.fillText(this.textPrompt,this.x+20,this.y+this.height-40);
+            }
         }
         
         // console.log(this.xText+' '+this.yText+' '+this.dyText);
@@ -149,6 +159,14 @@ var windowSelect={
                         //alert(545); 
                       //  this.addParamHuman(this.numBuilding,this.selectHover);
                         this.applySelect(this.numBuilding,this.selectHover);
+                        if (money<optionCity[this.numBuilding].list[this.selectHover].price)
+                        {
+                            this.textPrompt='Не достачно денег!';
+                        }
+                        else
+                        {
+                            this.textPrompt='';
+                        }
                        // this.close();
                     }
                 }
@@ -198,6 +216,18 @@ var windowSelect={
             this.close();
            
         }
+        let timeNow=new Date().getTime();
+        if (this.textPrompt!='' && this.timeTextPrompt==null)
+        {
+            this.timeTextPrompt=timeNow;
+        }
+        
+        if (timeNow>this.timeTextPrompt+1000)
+        {
+            this.timeTextPrompt=null;
+            this.textPrompt='';
+        }
+//        timeTextPrompt
         //console.log('select');
     },
     applySelect:function(numBuilding,numSelect)
@@ -208,7 +238,7 @@ var windowSelect={
         {
             
             this.addParamHuman(numBuilding,numSelect);
-            saveDataGame();
+           
         }
         else if (buildingArr[numBuilding].name=="nightClub")
         {
@@ -274,6 +304,7 @@ var windowSelect={
             {
                 money-=optionCity[numBuilding].list[numSelect].price;
                 day++;
+                saveDataGame();
             }
         }
     },
@@ -319,6 +350,7 @@ var city={
         humanBlue.HP=maxHpAndEnergy;
         humanBlue.energy=maxHpAndEnergy;
         resetMouseLeft();
+        saveDataGame(); 
         if (this.open==true)  this.timerId=setInterval(function(){
             city.update();
                

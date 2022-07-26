@@ -13,6 +13,7 @@ var modeGame='fight';
 var countOponent=null;
 var numFight=null;
 var gameOverText='';
+var continueGame=false;
 var pause=false;
 // var countMove=0;
 // var countSR=0;
@@ -689,7 +690,7 @@ function update()
                 {
                     money+=100;
                     modeGame='city';
-                    saveDataGame();
+                   // saveDataGame();
                     city.start();     
                 }
                 if (modeGame=='fightClub' )
@@ -704,7 +705,7 @@ function update()
                             money+=add;
                             day++;
                             modeGame='city';
-                            saveDataGame();
+                      //      saveDataGame();
                             city.start();   
                         }
                         else
@@ -729,7 +730,7 @@ function update()
                         
                         day++;
                         modeGame='city';
-                        saveDataGame();
+                     //   saveDataGame();
                         city.start();  
                     }
                 }
@@ -747,7 +748,7 @@ function update()
                 {
                    
                     day++;
-                    saveDataGame();
+                   // saveDataGame();
                     modeGame='city'; 
                     city.start();
                    
