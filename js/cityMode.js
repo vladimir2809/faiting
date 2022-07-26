@@ -149,6 +149,7 @@ var windowSelect={
                         //alert(545); 
                       //  this.addParamHuman(this.numBuilding,this.selectHover);
                         this.applySelect(this.numBuilding,this.selectHover);
+                       // this.close();
                     }
                 }
                 if (mouseX>this.buttonExit.x && mouseX<this.buttonExit.x+this.buttonExit.width&&
@@ -202,8 +203,8 @@ var windowSelect={
     applySelect:function(numBuilding,numSelect)
     {
         if (buildingArr[this.numBuilding].name=="rockingChair"||
-        buildingArr[this.numBuilding].name=="stadium"||
-        buildingArr[this.numBuilding].name=="martialSection")
+                buildingArr[this.numBuilding].name=="stadium"||
+                buildingArr[this.numBuilding].name=="martialSection")
         {
             this.addParamHuman(numBuilding,numSelect);
         }
@@ -226,19 +227,27 @@ var windowSelect={
         else if (buildingArr[numBuilding].name=="arena"&&
                 money>=optionCity[numBuilding].list[numSelect].price)
         {
-            modeGame='fightArena';
-            modeGameOption.apply=false;
+            if (numSelect!=4)
+            {
+                modeGame='fightArena';
+                //modeGameOption.countOponent=4;
+            }
+            else if( numSelect==4)
+            {
+                modeGame='fightChampion';
+                //alert(11);
+            }
             modeGameOption.numSelect=numSelect;
-            modeGameOption.countOponent=4;
+            modeGameOption.apply=false; 
             modeGameOption.numFight=1;
             money-=optionCity[numBuilding].list[numSelect].price;
-            
             this.close();
             city.close();
         }
 
     },
     addParamHuman:function(numBuilding,numSelect){
+        let flagMax=false;
         if (optionCity[numBuilding].name!='nightClub'&&
             optionCity[numBuilding].name!='arena'&&
             money>=optionCity[numBuilding].list[numSelect].price)
@@ -246,11 +255,23 @@ var windowSelect={
             let count=0;
             for(index in humanPlayerParam)
             {
-                humanPlayerParam[index]+=optionCity[numBuilding].list[numSelect].addParam[count];
+                let add=optionCity[numBuilding].list[numSelect].addParam[count];
+                if (humanPlayerParam[index]+add>maxParam[index])
+                {
+                    humanPlayerParam[index]=maxParam[index];
+                    flagMax=true;
+                }
+                else
+                {
+                    humanPlayerParam[index]+=add;
+                }
                 count++;
             }
-            money-=optionCity[numBuilding].list[numSelect].price;
-            day++;
+            if (flagMax==false)
+            {
+                money-=optionCity[numBuilding].list[numSelect].price;
+                day++;
+            }
         }
     },
 }
@@ -294,6 +315,7 @@ var city={
         this.mode='city';
         humanBlue.HP=maxHpAndEnergy;
         humanBlue.energy=maxHpAndEnergy;
+        resetMouseLeft();
         if (this.open==true)  this.timerId=setInterval(function(){
             city.update();
                
