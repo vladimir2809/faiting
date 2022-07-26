@@ -70,13 +70,13 @@ var optionCity=[
         
 ];
 var humanPlayerParam={
-    power:1,// сила втаки
-    endurance:1,// выносливость
-    speedMove:1,// скорость движений
+    power:15,// сила втаки
+    endurance:15,// выносливость
+    speedMove:15,// скорость движений
 
 };
 var optionHuman=[
-    {name:"Brad", power:10,endurance:10,speedMove:15,},
+    {name:"Brad", power:5,endurance:10,speedMove:10,},
     {name:"Maks", power:15,endurance:18,speedMove:3,},
     {name:"Victor", power:20,endurance:8,speedMove:20,},
 
