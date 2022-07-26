@@ -5,7 +5,7 @@ var numOptHuman=0;
 var screenWidth = 800;
 var screenHeight = 600;
 var timeNow = 0;
-var maxHpAndEnergy = 1000;
+var maxHpAndEnergy = 500;
 var gameOver = 0;// если 0 - игра продолжается, 1 - победил синий,2 - победил красный 
 var gameOverTime=null;
 var imageHuman=null;
@@ -101,7 +101,7 @@ function create()
     srand(time);
     initKeyboardAndMouse(['ArrowLeft','Space','Enter','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
-                            ,"KeyD","KeyS","KeyA","KeyM",'NumpadAdd','NumpadSubtract',
+                            ,"KeyD","KeyS","KeyA","KeyM",'KeyV','NumpadAdd','NumpadSubtract',
                         'Minus','Equal','Enter']); 
     imageHuman= new Image();
     imageHuman.src = 'img/imageHuman.png';
@@ -129,6 +129,7 @@ function create()
         
     }
     city.init(imageArr,imageHuman);
+    
     humanBlue=JSON.parse(JSON.stringify(Human));
     humanRed=JSON.parse(JSON.stringify(Human));
     startPositionHuman();
@@ -167,6 +168,7 @@ function create()
         }
     }
     console.log(humanBlue);
+    mainMenu.start();
 }
 function startPositionHuman()
 {
@@ -306,7 +308,11 @@ function calcArrLine(x,y,angleArr,scale=0.5)// расчитываем из ма�
 }
 function drawAll()
 {
-    if (city.open==false)
+    if(mainMenu.open==true)
+    {
+        mainMenu.draw();
+    }
+    else if (city.open==false)
     {  
         context.fillStyle='rgb(210,210,210)';
         context.fillRect(0,0,canvas.width,canvas.height);// очистка экрана
@@ -454,14 +460,14 @@ function update()
         numFight=modeGameOption.numFight;
         createHumansForFightArena();
     }
-    if (gameOver==0 && city.open==false && pause==false)// если игра идет
+    if (gameOver==0 && city.open==false && pause==false && mainMenu.open==false)// если игра идет
     {
         let dist = 35;
         if (keyUpDuration('KeyM',500))
         {
            // alert(565);
             modeGame='city';
-            
+            saveDataGame();
             city.start();
     
         }
@@ -516,6 +522,10 @@ function update()
         {
             humanBlue.speedMove-=10;
             if (humanBlue.speedMove<1) humanBlue.speedMove=1;
+        }
+        if (keyUpDuration('KeyV',50))
+        {
+            humanRed.HP=0;
         }
         // управление красным
         let dist2=humanRed.x-humanBlue.x;
@@ -679,6 +689,7 @@ function update()
                 {
                     money+=100;
                     modeGame='city';
+                    saveDataGame();
                     city.start();     
                 }
                 if (modeGame=='fightClub' )
@@ -693,6 +704,7 @@ function update()
                             money+=add;
                             day++;
                             modeGame='city';
+                            saveDataGame();
                             city.start();   
                         }
                         else
@@ -717,6 +729,7 @@ function update()
                         
                         day++;
                         modeGame='city';
+                        saveDataGame();
                         city.start();  
                     }
                 }
@@ -732,15 +745,19 @@ function update()
                 }
                 else
                 {
-                    modeGame='city';
-                    city.start();
+                   
                     day++;
+                    saveDataGame();
+                    modeGame='city'; 
+                    city.start();
+                   
                 }
             }
             gameOver = 0;
             //create();
             //alert(555);
         }
+        //saveDataGame();
     }
 
  }
@@ -888,5 +905,14 @@ function updateHuman(human,actionList)
         human.hitMade = 2; //alert(585);
         human.timeHitMe = new Date().getTime();;
     }
+}
+function saveDataGame()
+{
+    localStorage.setItem('dataGameFaiting',JSON.stringify({
+        money:money,
+        day:day,
+        param:humanPlayerParam
+    }));
+    console.log (JSON.parse(localStorage.dataGameFaiting));
 }
 

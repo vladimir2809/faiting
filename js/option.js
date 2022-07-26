@@ -25,9 +25,9 @@ var optionCity=[
         name:arrNameBuilding[0],// качалка
         nameLocal:"тренажерный зал",
         list: [{str:'тренироваться самому 1 час',price:10*multPricePump,addParam:[1,0,0]},
-            {str:'тренироваться самому 2 часа',price:20*multPricePump,addParam:[2,0,0]},
-            {str:'тренировка с тренером 1 час',price:45*multPricePump,addParam:[5,0,0]},
-            {str:'тренировка с тренером 2 часа',price:85*multPricePump,addParam:[10,0,0]}, 
+            {str:'тренироваться самому 2 часа',price:20*multPricePump,addParam:[3,0,0]},
+            {str:'тренировка с тренером 1 час',price:40*multPricePump,addParam:[7,0,0]},
+            {str:'тренировка с тренером 2 часа',price:80*multPricePump,addParam:[16,0,0]}, 
         ]        
     },
     {
@@ -43,40 +43,40 @@ var optionCity=[
     {
         name:arrNameBuilding[2],// ночной клуб
         nameLocal:"ночной клуб",
-        list: [{str:'работать вышибалой 1 час',price:10},
-            {str:'работать вышибалой 2 часа ',price:40},
-            {str:'работать вышибалой 4 часа',price:100},
-            {str:"работать вышибалой всю ночь",price:300}, 
+        list: [{str:'работать вышибалой 2 час',price:50},
+            {str:'работать вышибалой 4 часа ',price:120},
+            {str:'работать вышибалой 6 часа',price:300},
+            {str:"работать вышибалой всю ночь",price:600}, 
         ]        
     },
     {
         name:arrNameBuilding[3],// стадион
         nameLocal:"стадион",
         list: [{str:'бегать 20 минут',price:10*multPricePump,addParam:[0,1,0]},
-            {str:'бегать 40 минут',price:20*multPricePump,addParam:[0,2,0]},
-            {str:'бегать 1 час',price:45*multPricePump,addParam:[0,3,0]},
-            {str:'бегать 1.5 часа',price:80*multPricePump,addParam:[0,5,0]}, 
+            {str:'бегать 40 минут',price:20*multPricePump,addParam:[0,3,0]},
+            {str:'бегать 1 час',price:40*multPricePump,addParam:[0,7,0]},
+            {str:'бегать 1.5 часа',price:80*multPricePump,addParam:[0,16,0]}, 
         ]        
     },
     {
         name:arrNameBuilding[4],// секция боевых исскуств
         nameLocal:"секция",
         list: [{str:'занимать с мастером 30 минут',price:10*multPricePump,addParam:[0,0,1]},
-            {str:'занимать с мастером 1 час',price:20*multPricePump,addParam:[0,0,2]},
-            {str:'заниматься с мастером 1.5 часа',price:45*multPricePump,addParam:[0,0,5]},
-            {str:'заниматься с мастером 2 часа',price:80*multPricePump,addParam:[0,0,8]}, 
+            {str:'занимать с мастером 1 час',price:20*multPricePump,addParam:[0,0,3]},
+            {str:'заниматься с мастером 1.5 часа',price:40*multPricePump,addParam:[0,0,7]},
+            {str:'заниматься с мастером 2 часа',price:80*multPricePump,addParam:[0,0,16]}, 
         ]        
     },
         
 ];
 var humanPlayerParam={
-    power:10,// сила втаки
-    endurance:100,// выносливость
-    speedMove:15,// скорость движений
+    power:1,// сила втаки
+    endurance:1,// выносливость
+    speedMove:1,// скорость движений
 
 };
 var optionHuman=[
-    {name:"Brad", power:10,endurance:60,speedMove:15,},
+    {name:"Brad", power:10,endurance:10,speedMove:15,},
     {name:"Maks", power:15,endurance:18,speedMove:3,},
     {name:"Victor", power:20,endurance:8,speedMove:20,},
 

@@ -206,21 +206,24 @@ var windowSelect={
                 buildingArr[this.numBuilding].name=="stadium"||
                 buildingArr[this.numBuilding].name=="martialSection")
         {
+            
             this.addParamHuman(numBuilding,numSelect);
+            saveDataGame();
         }
         else if (buildingArr[numBuilding].name=="nightClub")
         {
             modeGame='fightClub';
             switch (numSelect)
             {
-                case 0: {modeGameOption.countOponent=1}break;
-                case 1: {modeGameOption.countOponent=2}break;
-                case 2: {modeGameOption.countOponent=4}break;
+                case 0: {modeGameOption.countOponent=2}break;
+                case 1: {modeGameOption.countOponent=4}break;
+                case 2: {modeGameOption.countOponent=6}break;
                 case 3: {modeGameOption.countOponent=8}break;
             }
             modeGameOption.apply=false;
             modeGameOption.numSelect=numSelect;
             console.log (modeGameOption.countOponent);
+            
             this.close();
             city.close();
         }
