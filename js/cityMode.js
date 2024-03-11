@@ -369,7 +369,7 @@ var city={
         context.fillStyle="#000000";
         context.fillRect(this.x,this.y,this.width,this.height);
        
-        for (let i=0;i<this.imageArr.length;i++)
+        for (let i=0;i<this.imageArr.length-3;i++)
         {
             context.save();
             context.scale(this.scale,this.scale);

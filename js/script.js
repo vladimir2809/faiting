@@ -4,6 +4,11 @@ var numOpt = 0;
 var numOptHuman=0;
 var screenWidth = 800;
 var screenHeight = 600;
+var windowWidth=document.documentElement.clientWidth;
+var windowHeight=document.documentElement.clientHeight;
+var canvasWidth= windowWidth;
+var canvasHeight= windowHeight;
+var canvasWidthMore = null;
 var timeNow = 0;
 var maxHpAndEnergy = 500;
 var gameOver = 0;// если 0 - игра продолжается, 1 - победил синий,2 - победил красный 
@@ -34,8 +39,13 @@ var maxParam={
     endurance:100,
     speedMove:100,
 }
-
-
+var frequencyPanel={x:100,y:300,stepY:65}
+var frequencyAction={
+    hitPanch:100,
+    hitKick:100,
+    hitKIckUp:100,
+}
+var slidersFrequency = [];
 
 window.addEventListener('load', function () { 
     create();
@@ -94,15 +104,85 @@ var Human={
     lineArr:[],
     
 }
+window.onresize = function()
+{
+    updateSize()
+    console.log("resize");
+}
+function updateSize()
+{
+    windowWidth=window.innerWidth//document.documentElement.clientWidth;
+    windowHeight=window.innerHeight//document.documentElement.clientHeight;
+    let mult = 1;
+    if (windowWidth>windowHeight)
+    {
+        canvasWidth = /*canvas.width = */windowHeight*screenWidth/screenHeight;
+        canvasHeight = /*canvas.height = */windowHeight;
+        if (canvasWidth>=windowWidth)
+        {
+            mult = windowWidth/canvasWidth;
+           // canvas.width =
+                canvasWidth *= mult;
+            //canvas.height =
+                canvasHeight *= mult;
+        }
+        canvasWidthMore = true;
+    }
+    else
+    {
+        canvasWidthMore = false;
+        canvasWidth = /*canvas.width*/  windowWidth;
+        canvasHeight= /*canvas.height*/  windowWidth*screenHeight/screenWidth;
+        //if (canvasHeight>=windowHeight)
+        //{
+        //    mult = windowHeight/canvasHeight ;
+        //   // canvas.width =
+        //        canvasWidth *= mult;
+        //    //canvas.height =
+        //        canvasHeight *= mult;
+        //}
+    }
+    
+    canvas.setAttribute('width',canvasWidth);
+    canvas.setAttribute('height',canvasHeight);
+    if (canvasWidthMore==false)
+    {
+        canvas.style.setProperty('left', '0px'); 
+    }
+    else
+    {
+        canvas.style.setProperty('left', (window.innerWidth - canvasWidth/*canvas.width*/)/2 + 'px'); 
+    }
+
+    canvas.style.setProperty('top', (window.innerHeight - canvasHeight/*canvas.height*/) / 2 + 'px'); 
+    console.log( (window.innerHeight - canvasHeight/*canvas.height*/) / 2 + 'px')
+    if (canvasWidthMore==true)
+    {
+        context.scale(windowHeight / screenHeight * mult, windowHeight / screenHeight * mult);   
+        mouseMultX = windowHeight / screenHeight * mult;
+        mouseMultY = windowHeight / screenHeight * mult;
+    }
+    else
+    {
+       context.scale(windowWidth/screenWidth,windowWidth/screenWidth);
+       mouseMultX = windowWidth / screenWidth;
+       mouseMultY = windowWidth / screenWidth;
+    }
+    //setOffsetMousePosXY((window.innerWidth - canvas.width)/2,
+    //                        (window.innerHeight - canvas.height)/2);
+    //camera.width = canvasWidth;
+    //camera.height = canvasHeight;
+}
 function create()
 {
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
     let time=new Date().getTime();
     srand(time);
+    updateSize();
     initKeyboardAndMouse(['ArrowLeft','Space','Enter','ArrowRight',
                             'ArrowUp','ArrowDown', 'ControlLeft',"KeyW"
-                            ,"KeyD","KeyS","KeyA","KeyM",'KeyV','NumpadAdd','NumpadSubtract',
+                            ,"KeyD","KeyS","KeyA","KeyM",'KeyV',"KeyF",'NumpadAdd','NumpadSubtract',
                         'Minus','Equal','Enter']); 
     imageHuman= new Image();
     imageHuman.src = 'img/imageHuman.png';
@@ -121,6 +201,20 @@ function create()
         imageArr[i].src='img/image'+(i+1)+'.png';
         imageArr[i].onload=function(){
             console.log ('Изображение image'+(i+1)+' успешно загружено!');
+        }
+        imageArr[i].onerror = function () {
+            alert("во время загрузки произошла ошибка");
+            //alert(pair[0].name);
+    
+        }
+        
+    }
+    for (let i=5;i<8;i++)
+    {
+        imageArr[i]=new Image();
+        imageArr[i].src='img/hit'+(i-4)+'.png';
+        imageArr[i].onload=function(){
+            console.log ('Изображение hit'+(i-4)+' успешно загружено!');
         }
         imageArr[i].onerror = function () {
             alert("во время загрузки произошла ошибка");
@@ -167,6 +261,13 @@ function create()
                 humanRed[indexHuman]=optionHuman[numOptHuman][index];
             }
         }
+    }
+    for (let i = 0; i < 3;i++)
+    {
+        let slider = new Slider(frequencyPanel.x,frequencyPanel.y+frequencyPanel.stepY*i+8,200,10,0,100);
+        slidersFrequency.push(slider);
+        slidersFrequency[i].init();
+
     }
     console.log(humanBlue);
     mainMenu.start();
@@ -220,6 +321,7 @@ function createHumansForFightArena()
     //numFight=modeGameOption.numFight;
     let numSelect=modeGameOption.numSelect;
     numOptHuman=(numSelect)*3+numFight-1;
+    console.log(numOptHuman)
     humanRed.name=optionHuman[numOptHuman].name;
     humanBlue.SR=0;
     humanRed.SR=0;
@@ -368,6 +470,11 @@ function drawAll()
             drawTextCenterScreen(gameOverText, "Arial", 30, color,screenHeight/2+10);
 
         }
+        for (let i = 0; i < 3;i++)
+        {
+            slidersFrequency[i].draw();
+            context.drawImage(imageArr[i+5],frequencyPanel.x-50,frequencyPanel.y+frequencyPanel.stepY*(i));
+        }
         if (pause==true)
         {
             color= 'White';
@@ -448,6 +555,7 @@ function update()
         //alert('pause');
     }
   
+
     if (modeGame=='fightClub' && modeGameOption.apply==false)
     {
         countOponent=modeGameOption.countOponent;
@@ -455,15 +563,39 @@ function update()
         console.log('checking');
         createHumansForFightClub();
     }
+    if (keyUpDuration('KeyF',500))
+    {
+        // alert(565);
+        modeGame='fightArena';
+        modeGameOption.apply = false;
+        modeGameOption.numSelect = 1;///numSelect;
+        city.close();
+        //alert(12);
+       // modeGameOption.apply=true;
+      //  numFight=modeGameOption.numFight;
+    //    createHumansForFightArena();
+        //saveDataGame();
+        //city.start();
+    
+    }
     if ((modeGame=='fightArena'|| modeGame=='fightChampion' )&& modeGameOption.apply==false)
     {
         modeGameOption.apply=true;
         numFight=modeGameOption.numFight;
         createHumansForFightArena();
     }
+ 
     if (gameOver==0 && city.open==false && pause==false && mainMenu.open==false)// если игра идет
     {
         let dist = 35;
+        for (let i = 0; i < 3;i++)
+        {
+            slidersFrequency[i].update();
+            slidersFrequency[i].clickBar(function () {
+                console.log(i+' '+slidersFrequency[i].value);
+            });
+            
+        }
         if (keyUpDuration('KeyM',500))
         {
            // alert(565);
@@ -472,6 +604,7 @@ function update()
             city.start();
     
         }
+   
         ///  если нажата кнопка на клавитатуре условие действия синего
 	    if (checkPressKey('ArrowRight') && humanBlue.SR!= 1&& humanBlue.x<humanRed.x-dist)
 	    {
