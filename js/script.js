@@ -20,6 +20,7 @@ var numFight=null;
 var gameOverText='';
 var continueGame=false;
 var pause=false;
+var pauseGameBar = 0;
 // var countMove=0;
 // var countSR=0;
 var speedCount=0;
@@ -39,11 +40,11 @@ var maxParam={
     endurance:100,
     speedMove:100,
 }
-var frequencyPanel={x:100,y:300,stepY:65}
+var frequencyPanel={x:280,y:360,width:300,stepY:65,}
 var frequencyAction={
     hitPanch:100,
     hitKick:100,
-    hitKIckUp:100,
+    hitKickUp:100,
 }
 var slidersFrequency = [];
 
@@ -264,7 +265,8 @@ function create()
     }
     for (let i = 0; i < 3;i++)
     {
-        let slider = new Slider(frequencyPanel.x,frequencyPanel.y+frequencyPanel.stepY*i+8,200,10,0,100);
+        let slider = new Slider(frequencyPanel.x,frequencyPanel.y+frequencyPanel.stepY*i+8,
+                    frequencyPanel.width,50,1,100);
         slidersFrequency.push(slider);
         slidersFrequency[i].init();
 
@@ -470,11 +472,26 @@ function drawAll()
             drawTextCenterScreen(gameOverText, "Arial", 30, color,screenHeight/2+10);
 
         }
-        for (let i = 0; i < 3;i++)
+
+        ///////////////////////////////////
+        //рисовние вероятности ударавов
+        //////////////////////////////////
+        if (gameOver==0) 
         {
-            slidersFrequency[i].draw();
-            context.drawImage(imageArr[i+5],frequencyPanel.x-50,frequencyPanel.y+frequencyPanel.stepY*(i));
+            context.strokeStyle = 'blue';
+            context.strokeRect(frequencyPanel.x - 50 - 5, frequencyPanel.y - 10,
+                            frequencyPanel.width + 50 +20 + 5*2,frequencyPanel.stepY*3);
+            for (let i = 0; i < 3;i++)
+            {
+                slidersFrequency[i].draw();
+                context.drawImage(imageArr[i+5],frequencyPanel.x-50,frequencyPanel.y+frequencyPanel.stepY*(i));
+            }
+            context.fillStyle='rgb(210,210,210)';
+            context.fillRect(frequencyPanel.x-50,frequencyPanel.y-15-7,190,20);
+            context.fillStyle = 'red';
+            context.fillText('Вероятность ударов',frequencyPanel.x-50,frequencyPanel.y-7);
         }
+
         if (pause==true)
         {
             color= 'White';
@@ -584,18 +601,51 @@ function update()
         numFight=modeGameOption.numFight;
         createHumansForFightArena();
     }
- 
-    if (gameOver==0 && city.open==false && pause==false && mainMenu.open==false)// если игра идет
+    for (let i = 0; i < 3;i++)
+    {
+        slidersFrequency[i].update();
+        //slidersFrequency[i].clickBar(function () {
+        //    console.log(i+' '+slidersFrequency[i].value);
+        //});
+        
+        if (pauseGameBar==0 && slidersFrequency[i].grabMouseBar==true)
+        {
+            //console.log(i+' '+slidersFrequency[i].value);
+            pauseGameBar = 1;
+        }
+            
+    }
+    if (pauseGameBar==1)
+    {
+        pauseGameBar = 2;
+        setTimeout(function () {
+            pauseGameBar = 0;
+            let summ = 0;
+            for (let i = 0; i < 3;i++)
+            {
+                summ += slidersFrequency[i].value;
+            }
+            frequencyAction.hitPanch = slidersFrequency[0].value / summ;
+            frequencyAction.hitKick = slidersFrequency[1].value / summ;
+            frequencyAction.hitKickUp = slidersFrequency[2].value / summ;
+            for (key in frequencyAction)
+            {
+                let value = Math.trunc(frequencyAction[key] * 100 + 0.5);
+                frequencyAction[key] = value == 0 ? 1 : value;
+            }
+            console.log(summ,frequencyAction)
+ /*           var frequencyAction={
+                hitPanch:100,
+                hitKick:100,
+                hitKickUp:100,
+            }*/
+        },750);
+    }
+    if (gameOver==0 && city.open==false && pause==false && pauseGameBar==0 && mainMenu.open==false)// если игра идет
     {
         let dist = 35;
-        for (let i = 0; i < 3;i++)
-        {
-            slidersFrequency[i].update();
-            slidersFrequency[i].clickBar(function () {
-                console.log(i+' '+slidersFrequency[i].value);
-            });
-            
-        }
+     
+      
         if (keyUpDuration('KeyM',500))
         {
            // alert(565);
@@ -917,7 +967,39 @@ function update()
             {
                 valueAttack=4;
             }
-            rand = randomInteger(0, 100) < 100 ? randomInteger(3, valueAttack) : 0;
+
+
+
+            let R = randomInteger(1, 100);
+
+            let attackSelect = 0;
+
+            if (R < frequencyAction.hitPanch)
+            {
+                attackSelect = 3;
+            }
+            else if (R > frequencyAction.hitPanch &&
+                R < frequencyAction.hitPanch+frequencyAction.hitKick ) 
+            {
+                attackSelect = 4;
+            }
+            else if (R > frequencyAction.hitPanch + frequencyAction.hitKick) 
+            {
+                attackSelect = 5;
+            }
+
+            
+
+            if (color=='red')
+            {
+                rand = randomInteger(0, 100) < 100 ? randomInteger(3, valueAttack) : 0;
+            }
+            else 
+            {
+                rand = randomInteger(0, 100) < 100 ? attackSelect : 0;
+                console.log('blue '+rand)
+            }
+            
 
             let multEndurance=Math.pow((1+(100-human.endurance)/100)*0.5,2);//0.25;
 
