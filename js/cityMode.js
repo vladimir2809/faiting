@@ -347,8 +347,8 @@ var city={
     start:function (){
         this.open=true;
         this.mode='city';
-        humanBlue.HP=maxHpAndEnergy;
-        humanBlue.energy=maxHpAndEnergy;
+        humanBlue.HP=maxHP;
+        humanBlue.energy=maxEnergy;
         resetMouseLeft();
         saveDataGame(); 
         if (this.open==true)  this.timerId=setInterval(function(){
@@ -385,6 +385,7 @@ var city={
         context.fillText("Сила: "+humanPlayerParam.power,x,y);
         context.fillText("Выносливость: "+humanPlayerParam.endurance,x,y+dx);
         context.fillText("Скорость: "+humanPlayerParam.speedMove,x,y+dx*2);
+        context.fillText("Защита: "+humanPlayerParam.protection,x,y+dx*3);
         context.fillStyle = 'rgb(0,255,0)';
         context.font = '25px Arial';
         context.fillText(money+'$',this.x+this.width-100,50);

@@ -72,27 +72,30 @@ var optionCity=[
 var humanPlayerParam={
     power:15,// сила втаки
     endurance:15,// выносливость
-    speedMove:15,// скорость движений
+    speedMove:100,//15,// скорость движений
+    protection:100, // зашита
 
 };
 var optionHuman=[
-    {name:"Brad", power:5,endurance:10,speedMove:10,},
-    {name:"Maks", power:15,endurance:18,speedMove:3,},
-    {name:"Victor", power:20,endurance:8,speedMove:20,},
+    // FHits=массив вероностей ударов 
+     {name:"TESTIK", power:15,endurance:15,speedMove:1,protection:80,FHIts:[33,33,33],},
+    {name:"Brad", power:5,endurance:10,speedMove:10,protection:30,FHIts:[98,1,1],},
+    {name:"Maks", power:15,endurance:18,speedMove:3,protection:30,FHIts:[33,33,33],},
+    //{name:"Victor", power:20,endurance:8,speedMove:20,protection:30,FHIts:[33,33,33],},
 
-    {name:"Sasha", power:18,endurance:15,speedMove:15,},
-    {name:"Fred", power:15,endurance:28,speedMove:13,},
-    {name:"Nikola", power:20,endurance:28,speedMove:10,},
+    /*{name:"Sasha", power:18,endurance:15,speedMove:15,protection:30,FHIts:[33,33,33],},
+    {name:"Fred", power:15,endurance:28,speedMove:13,protection:30,FHIts:[33,33,33],},
+    {name:"Nikola", power:20,endurance:28,speedMove:10,protection:30,FHIts:[33,33,33],},
 
-    {name:"Artur", power:40,endurance:60,speedMove:30,},
-    {name:"Vadim", power:45,endurance:40,speedMove:50,},
-    {name:"Nike", power:60,endurance:50,speedMove:70,},
+    {name:"Artur", power:40,endurance:60,speedMove:30,protection:30,FHIts:[33,33,33],},
+    {name:"Vadim", power:45,endurance:40,speedMove:50,protection:30,FHIts:[33,33,33],},
+    {name:"Nike", power:60,endurance:50,speedMove:70,protection:30,FHIts:[33,33,33],},
 
-    {name:"harry", power:95,endurance:90,speedMove:100,},
-    {name:"Thomas", power:100,endurance:90,speedMove:90,},
-    {name:"Oskar", power:95,endurance:95,speedMove:95,}, 
+    {name:"harry", power:95,endurance:90,speedMove:100,protection:30,FHIts:[33,33,33],},
+    {name:"Thomas", power:100,endurance:90,speedMove:90,protection:30,FHIts:[33,33,33],},
+    {name:"Oskar", power:95,endurance:95,speedMove:95,protection:30,FHIts:[33,33,33],}, 
 
-    {name:"Jack", power:100,endurance:100,speedMove:100,},
+    {name:"Jack", power:100,endurance:100,speedMove:100,protection:100,FHIts:[33,33,33],},*/
 
 
 
