@@ -33,7 +33,7 @@ var speedGameMult = 5;
 var numBlueWarrior = 0;
 var numRedWarrior = 0;
 var numTest = 0;
-var statistics = [];
+var statData = [];
 var nameArr = ['Brad','Maks','Victor','Sasha','Fred','Nikola','Artur','Vadim','Nike',];
 var modeGameOption={
     countOponent:null,
@@ -969,7 +969,7 @@ function update()
         {
             gameOverTime=timeNow;
         }
-        if (modeGame=='fightTest' && timeNow>gameOverTime+1000)
+        if (modeGame=='fightTest' && timeNow>gameOverTime+1000 /*&& gameOver!=0*/)
         {
             
             let stat={
@@ -990,35 +990,39 @@ function update()
                     result:gameOver==2?'winner':'loser',
                 }
             }
-            statistics.push(stat);
-            console.log(statistics)
-            let numTestOld = numTest;
+            statData.push(stat);
+            console.log(stat);
+            console.log(statData);
+            console.log(testHumanArr)
+            let numTestOld = numTest; // присваеваем страму номору тесту текуший
             do {
                 numRedWarrior++;
 
-                if (numRedWarrior > optionHuman.length) {
+                if (numRedWarrior >= testHumanArr.length) 
+                {
                     numRedWarrior = 0;
                     numBlueWarrior++;
                 }
-                if (numBlueWarrior >= optionHuman.length) 
+                // если поединки счетчик синего достиг до количества воинов в списке
+                if (numBlueWarrior >= testHumanArr.length &&
+                    numRedWarrior != numBlueWarrior) 
                 {
-                    console.log ('Test '+numTest+' End')
-                    statistics = [];
+                    console.log('Test ' + numTest + ' End');
                     numTest++;
-                    
-                    numRedWarrior = 0;
+                    numRedWarrior = 1;
                     numBlueWarrior = 0;
+                    break;
                 }
-            //    if (checkDoubleFight(optionHuman[numBlueWarrior].name, optionHuman[numRedWarrior].name)==false)
-            //    {
-            //        numTest++;
-            //        numRedWarrior = 0;
-            //        numBlueWarrior = 0;
-            //    }
-            } while ((numRedWarrior == numBlueWarrior ||
-                checkDoubleFight(optionHuman[numBlueWarrior].name, optionHuman[numRedWarrior].name) &&
-                    numTest==numTestOld)
-            );
+                console.log(testHumanArr[numBlueWarrior].name, testHumanArr[numRedWarrior].name);
+            } while (numRedWarrior == numBlueWarrior || 
+                      checkDoubleFight(testHumanArr[numBlueWarrior].name, testHumanArr[numRedWarrior].name)
+                    );
+            if (numTest!=numTestOld)// если был выход из цикла do-while
+            {
+                calcMaxWinOfParam();
+                statData = [];
+                console.log('END END');
+            }
             //numBlue = Math.trunc(numFight / (optionHuman.length - 1));
             createHumansForFightTest(testHumanArr,numBlueWarrior,numRedWarrior);
             gameOverTime=null;
@@ -1124,13 +1128,63 @@ function createTestHumanArr(count,minValue,maxValue)
         testHumanArr.push(humanOne);
 
     }
+    console.log(testHumanArr);
+}
+function calcMaxWinOfParam()
+{
+    let data = [];//['fred','fred','nikola','fred','nikola'];
+    for (let i = 0; i < statData.length;i++)
+    {
+        if (statData[i].humanBlue.result=='winner')
+        {
+            data.push(statData[i].humanBlue.name)
+        }
+        else if (statData[i].humanRed.result=='winner')
+        {
+            data.push(statData[i].humanRed.name)
+        }    
+    }
+    console.log(data)
+    let data2 = [];
+    for (let i = 0; i < data.length;i++)
+    {
+        if (i==0 || checkName(data[i],data2)==false)
+        {    
+            data2.push({name:data[i],count:1})
+            for (let j = 0; j < data.length;j++)
+            {
+                if (i!=j)
+                {
+                    len = data2.length - 1;
+                    if ( data2[len].name==data[j])
+                    {
+                        data2[len].count++;
+                    }
+                }
+
+            }
+        }
+        //else
+        //{
+        //    continue;
+        //}
+    }
+    function checkName(name,arr)
+    {
+        for (let i = 0; i < arr.length;i++)
+        {
+            if (name == arr[i].name) return true;
+        }
+        return false;
+    }
+    console.log(data2);
 }
 function checkDoubleFight(name1,name2)// проверить на повтор боя одних и тех же бойцов
 {
-    for (let i = 0; i < statistics.length;i++)
+    for (let i = 0; i < statData.length;i++)
     {
-        if ((statistics[i].humanBlue.name==name1 && statistics[i].humanRed.name==name2 )||
-            (statistics[i].humanBlue.name==name2 && statistics[i].humanRed.name==name1)) 
+        if ((statData[i].humanBlue.name==name1 && statData[i].humanRed.name==name2 )||
+            (statData[i].humanBlue.name==name2 && statData[i].humanRed.name==name1)) 
         {
             return true;
         }
@@ -1198,13 +1252,29 @@ function controllHuman(human,color,dist2,name,strategy=1)
             else if (color=='red')
             {
                 let FHits = [];
-                for (let i = 0; i < optionHuman.length;i++)
-                {
-                    if (optionHuman[i].name==name)
+                if (modeGame!='fightTest')
+                {    
+                    for (let i = 0; i < optionHuman.length;i++)
                     {
-                        FHits=clone(optionHuman[i].FHIts)
+                        if (optionHuman[i].name==name)
+                        {
+                            FHits=clone(optionHuman[i].FHIts)
 
+                        }
                     }
+                }
+                else
+                {
+                    
+                    for (let i = 0; i < testHumanArr.length;i++)
+                    {
+                        if ( testHumanArr[i].name==name)
+                        {
+                            FHits=clone(testHumanArr[i].FHIts)
+
+                        }
+                    }
+                 
                 }
                 if (R < FHits[0])
                 {
