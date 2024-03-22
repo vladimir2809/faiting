@@ -33,7 +33,9 @@ var speedGameMult = 5;
 var numBlueWarrior = 0;
 var numRedWarrior = 0;
 var numTest = 0;
+var testEnd = false;
 var statData = [];
+var statDataRes = [];
 var nameArr = ['Brad','Maks','Victor','Sasha','Fred','Nikola','Artur','Vadim','Nike',];
 var modeGameOption={
     countOponent:null,
@@ -482,11 +484,11 @@ function drawAll()
     else if (city.open==false)
     {  
         context.fillStyle='rgb(210,210,210)';
-        context.fillRect(0,0,canvas.width,canvas.height);// очистка экрана
+        context.fillRect(0,0,screenWidth,screenHeight);// очистка экрана
         context.beginPath();
         context.strokeStyle='rgb(0,0,0)';
-        context.moveTo(1,canvas.height/2);
-        context.lineTo(canvas.width,canvas.height/2 );
+        context.moveTo(1,screenHeight/2);
+        context.lineTo(screenWidth,screenHeight/2 );
         context.stroke();
         drawHuman(humanBlue,'Blue');
         drawHuman(humanRed, "Red");
@@ -568,15 +570,20 @@ function drawAll()
             drawTextCenterScreen('Пауза', "Arial", 50, color,screenHeight/2-40);
             //context.fillText(countWinBlue+'',x,100);
         }
-    }else if (city.open==true)
+        if (testEnd==true)
+        {
+            drawStatTest();
+        }
+    }
+    else if (city.open==true)
     {
         city.draw();
     }
 }
-function drawStrip(x,y,value,max,side,color)// нарисовать полоску
+function drawStrip(x,y,value,max,side,color,height=20)// нарисовать полоску
 {
     context.fillStyle=color;
-    let height = 20;
+    //let height = 20;
     let width = screenWidth * 0.4;
     if (side==0)
     {
@@ -632,6 +639,71 @@ function drawTextCenterScreen(text,font,fontSize,color='rgb(255,128,0)',yText=nu
    // context.strokeRect(this.widthTab*i,this.y,this.widthTab,20);
     context.fillText(text, x + width / 2 - metrics.width / 2, yText == null ? y + screenHeight / 2 + fontSize / 3 : yText);
 }
+function drawStatTest()
+{
+    let width = 400;
+    let height = 400;
+    let x = screenWidth/2-width/2;
+    let y = screenHeight/2-height/2;
+    let widthArr = [0,80,130,210,260,335];
+    context.fillStyle = 'black';
+    context.fillRect(x, y, width, height);
+
+    context.fillStyle = 'white';
+    context.font = '14px Arial';
+    y += 20;
+    context.fillText('Name',x,y);
+    context.fillText('power',x+widthArr[1],y);
+    context.fillText('endurance',x+widthArr[2],y);
+    context.fillText('speed',x+widthArr[3],y);
+    context.fillText('protection',x+widthArr[4],y);
+    context.fillText('wineers',x+widthArr[5],y);
+    y -= 20;
+    context.strokeStyle='white';
+    for (let i = 1; i < widthArr.length;i++)
+    {
+
+        context.beginPath();
+        context.moveTo(x+widthArr[i]-5,y);
+        context.lineTo(x+widthArr[i]-5,y+height );
+        context.stroke();
+    }
+    y += 20;
+    context.beginPath();
+    context.moveTo(x,y);
+    context.lineTo(x+width,y);
+    context.stroke();
+    y += 20;
+    for (let i = 0; i < testHumanArr.length;i++)
+    {
+        context.fillStyle = 'white';
+        context.fillText(testHumanArr[i].name,x+widthArr[0]+3,y+i*20-3);
+        context.fillText(testHumanArr[i].power,x+widthArr[1]+3,y+i*20-3);
+        context.fillText(testHumanArr[i].endurance,x+widthArr[2]+3,y+i*20-3);
+        context.fillText(testHumanArr[i].speedMove,x+widthArr[3]+3,y+i*20-3);
+        context.fillText(testHumanArr[i].protection,x+widthArr[4]+3,y+i*20-3);
+        context.beginPath();
+        context.moveTo(x,y+i*20);
+        context.lineTo(x+width,y+i*20);
+        context.stroke();
+        let value = 0;
+        for (let j = 0; j < statDataRes.length;j++)
+        {
+            if (testHumanArr[i].name==statDataRes[j].name)
+            {
+                value = statDataRes[j].count;
+            }
+        }
+        let max = testHumanArr.length;
+        let widthBar = 35;
+        context.fillStyle = 'red';
+        context.fillRect(x+widthArr[5]+3,y+i*20-13,widthBar,10);
+        context.fillStyle = 'green';
+        context.fillRect(x+widthArr[5]+3,y+i*20-13,widthBar*(value/max),10);
+        //drawStrip(x+widthArr[5]+3,y+i*20-3,value,10,0,"red",4)
+        
+    }
+}
 function update()
 {
 	 //updateLineHuman(100,263,1);
@@ -653,12 +725,14 @@ function update()
     if (keyUpDuration('KeyT',500))
     {
         // alert(565);
+        testEnd = false;
         modeGame='fightTest';
         numFight = 1;
         modeGameOption.apply = false;
         modeGameOption.numSelect = 0;///numSelect;
         city.close();
-        createTestHumanArr(3, 10, 20);
+        gameOver = 0;
+        createTestHumanArr(4, 10, 20);
         createHumansForFightTest(testHumanArr, 0,1);
         //alert(12);
        // modeGameOption.apply=true;
@@ -969,7 +1043,7 @@ function update()
         {
             gameOverTime=timeNow;
         }
-        if (modeGame=='fightTest' && timeNow>gameOverTime+1000 /*&& gameOver!=0*/)
+        if (modeGame=='fightTest' && timeNow>gameOverTime+1000 && testEnd==false)
         {
             
             let stat={
@@ -1011,6 +1085,7 @@ function update()
                     numTest++;
                     numRedWarrior = 1;
                     numBlueWarrior = 0;
+                    
                     break;
                 }
                 console.log(testHumanArr[numBlueWarrior].name, testHumanArr[numRedWarrior].name);
@@ -1019,15 +1094,19 @@ function update()
                     );
             if (numTest!=numTestOld)// если был выход из цикла do-while
             {
-                calcMaxWinOfParam();
+                statDataRes=calcMaxWinOfParam();
+                testEnd = true;
                 statData = [];
                 console.log('END END');
             }
             //numBlue = Math.trunc(numFight / (optionHuman.length - 1));
-            createHumansForFightTest(testHumanArr,numBlueWarrior,numRedWarrior);
-            gameOverTime=null;
-            gameOver = 0;
-            console.log('testEndFight: ' + numFight);
+            if (testEnd==false)
+            {
+                createHumansForFightTest(testHumanArr,numBlueWarrior,numRedWarrior);
+                gameOverTime=null;
+                gameOver = 0;
+                console.log('testEndFight: ' + numFight);
+            }
         }
         if ((checkPressKey('Space')==true || timeNow>gameOverTime+3000) &&
             (modeGame=='fightClub' || modeGame=='fightArena' || modeGame=='fight' ) )
@@ -1178,6 +1257,7 @@ function calcMaxWinOfParam()
         return false;
     }
     console.log(data2);
+    return data2;
 }
 function checkDoubleFight(name1,name2)// проверить на повтор боя одних и тех же бойцов
 {
