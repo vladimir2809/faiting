@@ -136,7 +136,7 @@ var windowSelect={
             {
                 context.fillStyle="#FFFFFF";
                 context.font = '24px Arial';
-                context.fillText(this.textPrompt,this.x+20,this.y+this.height-40);
+                context.fillText(this.textPrompt,this.x+20,this.y+this.height-20);
             }
         }
         
