@@ -131,6 +131,7 @@ var mainMenu={
                         humanPlayerParam=clone(obj.param);
                         continueGame=true;
                         modeGame='city';
+                        dataTourney = obj.dataTourney;
                         city.start();
                         //console.log(localStorage.getItem('dataGameFaiting'));
                         this.close();

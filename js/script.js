@@ -49,6 +49,7 @@ var money=0;
 var day=1;
 var imageArr=[];
 var testHumanArr = [];
+var numSelectTourney = null;
 var maxParam={
     power:100,
     endurance:100,
@@ -62,7 +63,14 @@ var frequencyAction={
     hitKickUp:33,// вероятность удара ногой вверх
 }
 var slidersFrequency = [];
+var dataTourney = [
+    {count:0,open:true},
+    {count:0,open:true},
+    {count:0,open:false},
+    {count:0,open:false},
+    {count:0,open:false},
 
+];
 window.addEventListener('load', function () { 
     create();
     setInterval(update,16); 
@@ -880,6 +888,7 @@ function update()
         if (keyUpDuration('KeyV',50))
         {
             humanRed.HP=0;
+            numFight = 3;
         }
         for (let i = 0; i < 1;i++)
         {    
@@ -950,6 +959,7 @@ function update()
                 {
                     let reward=optionCity[1].list[modeGameOption.numSelect].reward;
                     gameOverText='Вы победитель турнира и забираете приз '+reward+'$';
+
                 }
             }
             if (modeGame=='fightClub')
@@ -1061,7 +1071,8 @@ function update()
             }
         }
         if ((checkPressKey('Space')==true || timeNow>gameOverTime+3000) &&
-            (modeGame=='fightClub' || modeGame=='fightArena' || modeGame=='fight' ) )
+            (modeGame=='fightClub' || modeGame=='fightArena' || 
+             modeGame=='fight' || modeGame=='fightChampion' ) )
         {
             gameOverTime=null;
             if (gameOver==1)
@@ -1108,16 +1119,46 @@ function update()
                     {
                        
                         money+=optionCity[1].list[modeGameOption.numSelect].reward;
-                        
+                        if (/*numSelectTourney>0 &&*/ numSelectTourney<4)
+                        {
+                            dataTourney[numSelectTourney].count++;
+                            if (dataTourney[numSelectTourney].open == true && 
+                                dataTourney[numSelectTourney].count>=2)
+                            {
+                                if (numSelectTourney!=3)dataTourney[numSelectTourney].open = false;
+                                if (numSelectTourney==2)
+                                {
+                                    dataTourney[0].open = false;
+                                    dataTourney[1].open = false;
+                                }
+                                if (numSelectTourney==0 || numSelectTourney==1)
+                                {
+                                    dataTourney[2].open = true;
+                                }
+                                else
+                                {   
+                                   
+                                    dataTourney[numSelectTourney+1].open = true;
+                                }
+                            }
+
+                        }
                         day++;
                         modeGame='city';
                      //   saveDataGame();
                         city.start();  
                     }
                 }
+           /*     if (modeGame=='fightChampion')
+                {
+                    day++;
+                    modeGame='city';
+                    //saveDataGame();
+                    city.start();
+                }*/
             
             }  
-            else
+            else 
             {
                 gameOverText='';
                 if (modeGame=='fight')
@@ -1628,7 +1669,8 @@ function saveDataGame()
     localStorage.setItem('dataGameFaiting',JSON.stringify({
         money:money,
         day:day,
-        param:humanPlayerParam
+        param:humanPlayerParam,
+        dataTourney: dataTourney,
     }));
     console.log (JSON.parse(localStorage.dataGameFaiting));
 }

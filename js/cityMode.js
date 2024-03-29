@@ -116,6 +116,11 @@ var windowSelect={
                                 this.yText+this.dyText*j); 
                 let text2=optionCity[this.numBuilding].list[j].price+'';
                 let metrics2 = context.measureText(text2);
+                if (optionCity[this.numBuilding].name=='arena')
+                {
+                    let addStr = dataTourney[j].count;
+                    context.fillText(''+dataTourney[j].open+addStr,this.xText+350,this.yText+this.dyText*j); 
+                }
                 if (optionCity[this.numBuilding].name=='nightClub')
                 {
                     context.fillText('за +'+text2+'$',this.x+this.width-metrics2.width-70,
@@ -135,7 +140,7 @@ var windowSelect={
             if (this.textPrompt!='')
             {
                 context.fillStyle="#FFFFFF";
-                context.font = '24px Arial';
+                context.font = '22px Arial';
                 context.fillText(this.textPrompt,this.x+20,this.y+this.height-20);
             }
         }
@@ -166,6 +171,14 @@ var windowSelect={
                         else
                         {
                             this.textPrompt='';
+                        }
+                        if (optionCity[this.numBuilding].name=='arena')
+                        {
+                            if (dataTourney[this.selectHover].open==false)
+                            {
+                                this.textPrompt='Вы не можете участвовать в этом турнире!';
+                               // return;
+                            }
                         }
                        // this.close();
                     }
@@ -260,6 +273,12 @@ var windowSelect={
         else if (buildingArr[numBuilding].name=="arena"&&
                 money>=optionCity[numBuilding].list[numSelect].price)
         {
+
+            if (dataTourney[numSelect].open==false)
+            {
+                //this.textPrompt='Вы не можете участвовать в этом турнире!';
+                return;
+            }
             if (numSelect!=4)
             {
                 modeGame='fightArena';
@@ -270,6 +289,7 @@ var windowSelect={
                 modeGame='fightChampion';
                 //alert(11);
             }
+            numSelectTourney = numSelect;
             modeGameOption.numSelect=numSelect;
             modeGameOption.apply=false; 
             modeGameOption.numFight=1;
